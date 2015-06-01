@@ -1,11 +1,12 @@
-#include <GL\glaux.h>
+#include <gl\glut.h>
+#include <windows.h>
+#include <FreeImage.h>
 
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
 class Texture {
 public:
-    _AUX_RGBImageRec *im;
     void load(char *filename);
     void setActive();
     int getWidth() const;
