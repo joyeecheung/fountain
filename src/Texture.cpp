@@ -11,7 +11,7 @@ void Texture::load(char *filename) {
                       3,
                       width,
                       height,
-                      GL_RGB,
+                      GL_BGR_EXT,
                       GL_UNSIGNED_BYTE,
                       FreeImage_GetBits(bitmap));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

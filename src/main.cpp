@@ -20,8 +20,8 @@ GLfloat LightPosition[] = { 1.0f, -0.5f, -0.5f, 0.0f };
 //Constants:
 #define NUM_X_OSCILLATORS		170
 #define NUM_Z_OSCILLATORS		170
-#define OSCILLATOR_DISTANCE		0.025
-#define OSCILLATOR_WEIGHT       0.0001
+#define OSCILLATOR_DISTANCE		0.020
+#define OSCILLATOR_WEIGHT       0.00008
 
 #define MAXX					(NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE)
 #define MAXZ					(NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE)
@@ -91,7 +91,7 @@ void keyDown(unsigned char key, int x, int y) {
         case '1':
             pool.reset();
             fountain.destroy();
-            fountain.initialize(3, 8, 35, 76, 90, 0.5, 0.11);
+            fountain.initialize(5, 70, 40, 70, 90, 0.2, 0.11);
             break;
         case '2':
             pool.reset();
@@ -118,8 +118,6 @@ void keyDown(unsigned char key, int x, int y) {
             pool.reset();
             fountain.initialize(4, 100, 45, 76, 90, 0.2, 0.11);
             break;
-
-
     }
 }
 void RenderBowl(void) {
@@ -351,7 +349,7 @@ void reshape(int x, int y) {
 
 void idle(void) {
     //Do the physical calculation for one step:
-    float dtime = 0.006;
+    float dtime = 0.003;
     fountain.update(dtime, &pool);
     pool.update(dtime);
 
@@ -367,7 +365,9 @@ int main(int argc, char **argv) {
     //Create a window with rendering context and everything else we need
     glutCreateWindow("Fountain with simulated water");
     //compute the vertices and indices
-    pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS, OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT, 0.05, 4.0, 4.0);
+    pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS,
+                    OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
+                    0.03, 4.0, 4.0);
     //init the airfountain: (look at KeyDown() to see more possibilities of initialization)
     fountain.initialize(5, 70, 40, 70, 90, 0.2, 0.11);
 

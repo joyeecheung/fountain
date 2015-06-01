@@ -1,4 +1,5 @@
-#include <gl\glut.h>
+#include <gl/glut.h>
+
 #include <windows.h>
 #include <FreeImage.h>
 

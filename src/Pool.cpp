@@ -18,7 +18,7 @@ void Pool::initialize(int xSize, int zSize, float oDistance,
 
     //temporary vector for indies:
     vector <GLuint> idxVector;  // we first put the indices into this vector
-                                // then copy them to the array below
+    // then copy them to the array below
 
     oscillators = new Oscillator[numOscillators];
     idxVector.clear();  //to be sure it is empty
@@ -96,9 +96,9 @@ void Pool::update(float deltaTime) {
 
     for (xc = 0; xc < xSize; xc++) {
         for (zc = 0; zc < zSize; zc++) {
-            int arrayPos = xc + zc*xSize;
+            int idx = xc + zc*xSize;
 
-            oscillators[arrayPos].newY = oscillators[arrayPos].y;
+            oscillators[idx].newY = oscillators[idx].y;
 
             //check, if this oscillator is on an edge (=>end)
             if ((xc == 0) || (xc == xSize - 1) || (zc == 0) || (zc == zSize - 1))
@@ -107,18 +107,19 @@ void Pool::update(float deltaTime) {
                 //calculate the new speed:
 
                 //Change the speed (=accelerate) according to the oscillator's 4 direct neighbors:
-                float avgDifference = oscillators[arrayPos - 1].y				//left neighbor
-                    + oscillators[arrayPos + 1].y				//right neighbor
-                    + oscillators[arrayPos - xSize].y  //upper neighbor
-                    + oscillators[arrayPos + xSize].y  //lower neighbor
-                    - 4 * oscillators[arrayPos].y;				//subtract the pos of the current osc. 4 times	
+                float avgDifference = oscillators[idx - 1].y //left neighbor
+                    + oscillators[idx + 1].y 		//right neighbor
+                    + oscillators[idx - xSize].y  //upper neighbor
+                    + oscillators[idx + xSize].y  //lower neighbor
+                    - 4 * oscillators[idx].y;	  //subtract the pos of the current osc. 4 times	
 
-                oscillators[arrayPos].upSpeed += avgDifference*(deltaTime / oscillatorWeight);
+                oscillators[idx].upSpeed += avgDifference*(deltaTime / oscillatorWeight);
 
-                oscillators[arrayPos].upSpeed *= (1.0f - damping);
+                oscillators[idx].upSpeed *= (1.0f - damping);
 
-                //calculate the new position, but do not yet store it in "y" (this would affect the calculation of the other osc.s)
-                oscillators[arrayPos].newY += oscillators[arrayPos].upSpeed*deltaTime;
+                //calculate the new position, but do not yet store it in "y"
+                // (this would affect the calculation of the other osc.s)
+                oscillators[idx].newY += oscillators[idx].upSpeed * deltaTime;
 
             }
         }
@@ -150,15 +151,15 @@ void Pool::update(float deltaTime) {
                               oscillators[xc + zc*xSize].y,
                               oscillators[xc + zc*xSize].z);
             }
-            
+
             if (xc < xSize - 1) {
                 p2 = FVector3(oscillators[xc + 1 + zc*xSize].x,
                               oscillators[xc + 1 + zc*xSize].y,
                               oscillators[xc + 1 + zc*xSize].z);
             } else {
                 p2 = FVector3(oscillators[xc + zc*xSize].x,
-                               oscillators[xc + zc*xSize].y,
-                               oscillators[xc + zc*xSize].z);
+                              oscillators[xc + zc*xSize].y,
+                              oscillators[xc + zc*xSize].z);
             }
 
             u = p2 - p1; //vector from the left neighbor to the right neighbor
@@ -168,8 +169,8 @@ void Pool::update(float deltaTime) {
                               oscillators[xc + (zc - 1)*xSize].z);
             } else {
                 p1 = FVector3(oscillators[xc + zc*xSize].x,
-                               oscillators[xc + zc*xSize].y,
-                               oscillators[xc + zc*xSize].z);
+                              oscillators[xc + zc*xSize].y,
+                              oscillators[xc + zc*xSize].z);
             }
 
             if (zc < zSize - 1) {
@@ -178,8 +179,8 @@ void Pool::update(float deltaTime) {
                               oscillators[xc + (zc + 1)*xSize].z);
             } else {
                 p2 = FVector3(oscillators[xc + zc*xSize].x,
-                               oscillators[xc + zc*xSize].y,
-                               oscillators[xc + zc*xSize].z);
+                              oscillators[xc + zc*xSize].y,
+                              oscillators[xc + zc*xSize].z);
             }
             v = p2 - p1; //vector from the upper neighbor to the lower neighbor
             //calculate the normal:
