@@ -1,0 +1,10 @@
+*.ilk
+*.opensdf
+*.sdf
+*.suo
+*.exe
+Debug
+*.pdf
+*.log
+*.pdb
+*.tlog
