@@ -8,6 +8,7 @@
 
 class Texture {
 public:
+    Texture() {}
     void load(char *filename);
     void setActive();
     int getWidth() const;

@@ -74,6 +74,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Basin.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Fountain.cpp" />
     <ClCompile Include="src\FVector.cpp" />
@@ -82,6 +83,7 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Basin.h" />
     <ClInclude Include="src\bitmap_image.hpp" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Fountain.h" />

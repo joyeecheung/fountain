@@ -30,11 +30,11 @@ public:
     FVector3 position;
     void render();
     void update(float dtime, Pool * pPool);
-    GLint m_NumDropsComplete;
+    GLint numDrops;
     void initialize(GLint steps, GLint raysPerStep, GLint dropsPerRay,
-                    GLfloat angleOfDeepestStep,
-                    GLfloat angleOfHighestStep,
-                    GLfloat randomAngleAddition,
-                    GLfloat accFactor);
+                    GLfloat stepAngleMin,
+                    GLfloat stepAngleMax,
+                    GLfloat randomAngle,
+                    GLfloat acceleration);
     void destroy();
 };
