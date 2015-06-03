@@ -82,6 +82,7 @@
     <ClCompile Include="src\Ground.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Pool.cpp" />
+    <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +93,7 @@
     <ClInclude Include="src\FVector.h" />
     <ClInclude Include="src\Ground.h" />
     <ClInclude Include="src\Pool.h" />
+    <ClInclude Include="src\SkyBox.h" />
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
