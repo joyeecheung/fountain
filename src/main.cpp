@@ -208,8 +208,9 @@ int main(int argc, char **argv) {
     skyboxTextures[SKY_LEFT].load("resource/skybox/left.bmp", GL_CLAMP_TO_EDGE);
     skyboxTextures[SKY_BACK].load("resource/skybox/back.bmp", GL_CLAMP_TO_EDGE);
     skyboxTextures[SKY_UP].load("resource/skybox/up.bmp", GL_CLAMP_TO_EDGE);
+    skyboxTextures[SKY_DOWN].load("resource/skybox/down.bmp", GL_CLAMP_TO_EDGE);
 
-    skybox.initialize(-20.0f, 20.0f, 0.0f, 10.0f, -20.0f, 20.0f, skyboxTextures);
+    skybox.initialize(-20.0f, 20.0f, -20.0f, 20.0f, -20.0f, 20.0f, skyboxTextures);
     //compute the vertices and indices
     pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS,
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,

@@ -9,7 +9,7 @@
 #define SKY_LEFT 2
 #define SKY_BACK 3
 #define SKY_UP 4
-//#define SKY_DOWN 5
+#define SKY_DOWN 5
 
 class Skybox {
 public:

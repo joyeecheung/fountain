@@ -55,13 +55,13 @@ void Skybox::initialize(float minX, float maxX,
     glTexCoord2f(0, 1); glVertex3f(minX, maxY, maxZ);
     glEnd();
 
-    /*textures[SKY_DOWN].bind();
+    textures[SKY_DOWN].bind();
     glBegin(GL_QUADS);
     glTexCoord2f(1, 1); glVertex3f(maxX, minY, minZ);
     glTexCoord2f(0, 1); glVertex3f(minX, minY, minZ);
     glTexCoord2f(0, 0); glVertex3f(minX, minY, maxZ);
     glTexCoord2f(1, 0); glVertex3f(maxX, minY, maxZ);
-    glEnd();*/
+    glEnd();
 
     glEndList();
 }
