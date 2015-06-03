@@ -1,7 +1,7 @@
 #include "Basin.h"
 
 void Basin::render() {
-    texture->setActive();
+    texture->bind();
 
     glBegin(GL_QUADS);
 

@@ -24,16 +24,16 @@ void Pool::initialize(int xSize, int zSize, float oDistance,
     idxVector.clear();  //to be sure it is empty
     for (int xc = 0; xc < xSize; xc++)
         for (int zc = 0; zc < zSize; zc++) {
-            oscillators[xc + zc*xSize].x = oscillatorDistance*float(xc);
-            oscillators[xc + zc*xSize].y = 0.0f;
-            oscillators[xc + zc*xSize].z = oscillatorDistance*float(zc);
+            oscillators[xc + zc*xSize].position.x = oscillatorDistance*float(xc);
+            oscillators[xc + zc*xSize].position.y = 0.0f;
+            oscillators[xc + zc*xSize].position.z = oscillatorDistance*float(zc);
 
-            oscillators[xc + zc*xSize].nx = 0.0f;
-            oscillators[xc + zc*xSize].ny = 1.0f;
-            oscillators[xc + zc*xSize].nz = 0.0f;
+            oscillators[xc + zc*xSize].normal.x = 0.0f;
+            oscillators[xc + zc*xSize].normal.y = 1.0f;
+            oscillators[xc + zc*xSize].normal.z = 0.0f;
 
-            oscillators[xc + zc*xSize].u = (float)xc / (float)xSize * textureStretchX;
-            oscillators[xc + zc*xSize].v = 1.0f - (float)zc / (float)zSize * textureStretchZ;
+            oscillators[xc + zc*xSize].texX = (float)xc / (float)xSize * textureStretchX;
+            oscillators[xc + zc*xSize].texY = 1.0f - (float)zc / (float)zSize * textureStretchZ;
 
             oscillators[xc + zc*xSize].upSpeed = 0;
 
@@ -64,19 +64,19 @@ void Pool::initialize(int xSize, int zSize, float oDistance,
 void Pool::reset() {
     for (int xc = 0; xc < xSize; xc++)
         for (int zc = 0; zc < zSize; zc++) {
-            oscillators[xc + zc*xSize].y = 0.0f;
+            oscillators[xc + zc*xSize].position.y = 0.0f;
             oscillators[xc + zc*xSize].upSpeed = 0.0f;
-            oscillators[xc + zc*xSize].nx = 0.0f;
-            oscillators[xc + zc*xSize].ny = 1.0f;
-            oscillators[xc + zc*xSize].nz = 0.0f;
+            oscillators[xc + zc*xSize].normal.x = 0.0f;
+            oscillators[xc + zc*xSize].normal.y = 1.0f;
+            oscillators[xc + zc*xSize].normal.z = 0.0f;
         }
 }
 
 void Pool::affectOscillator(int xPos, int zPos, float deltaY) {
     if ((xPos >= 0) && (xPos < xSize) && (zPos >= 0) && (zPos < zSize)) {
         //THIS LINE IS REQUIRED FOR FOUNTAINS WITH MANY DROPS!!!
-        if (oscillators[xPos + zPos*xSize].y > -0.15)
-            oscillators[xPos + zPos*xSize].y += deltaY;
+        if (oscillators[xPos + zPos*xSize].position.y > -0.15)
+            oscillators[xPos + zPos*xSize].position.y += deltaY;
     }
 }
 
@@ -98,7 +98,7 @@ void Pool::update(float deltaTime) {
         for (zc = 0; zc < zSize; zc++) {
             int idx = xc + zc*xSize;
 
-            oscillators[idx].newY = oscillators[idx].y;
+            oscillators[idx].newY = oscillators[idx].position.y;
 
             //check, if this oscillator is on an edge (=>end)
             if ((xc == 0) || (xc == xSize - 1) || (zc == 0) || (zc == zSize - 1))
@@ -107,11 +107,11 @@ void Pool::update(float deltaTime) {
                 //calculate the new speed:
 
                 //Change the speed (=accelerate) according to the oscillator's 4 direct neighbors:
-                float avgDifference = oscillators[idx - 1].y //left neighbor
-                    + oscillators[idx + 1].y 		//right neighbor
-                    + oscillators[idx - xSize].y  //upper neighbor
-                    + oscillators[idx + xSize].y  //lower neighbor
-                    - 4 * oscillators[idx].y;	  //subtract the pos of the current osc. 4 times	
+                float avgDifference = oscillators[idx - 1].position.y //left neighbor
+                    + oscillators[idx + 1].position.y 		//right neighbor
+                    + oscillators[idx - xSize].position.y  //upper neighbor
+                    + oscillators[idx + xSize].position.y  //lower neighbor
+                    - 4 * oscillators[idx].position.y;	  //subtract the pos of the current osc. 4 times	
 
                 oscillators[idx].upSpeed += avgDifference*(deltaTime / oscillatorWeight);
 
@@ -128,7 +128,7 @@ void Pool::update(float deltaTime) {
     //copy the new position to y:
     for (xc = 0; xc < xSize; xc++) {
         for (int zc = 0; zc < zSize; zc++) {
-            oscillators[xc + zc*xSize].y = oscillators[xc + zc*xSize].newY;
+            oscillators[xc + zc*xSize].position.y = oscillators[xc + zc*xSize].newY;
         }
     }
     //calculate new normal vectors (according to the oscillator's neighbors):
@@ -143,58 +143,58 @@ void Pool::update(float deltaTime) {
             FVector3 u, v, p1, p2;	//u and v are direction vectors. p1 / p2: temporary used (storing the points)
 
             if (xc > 0) {
-                p1 = FVector3(oscillators[xc - 1 + zc*xSize].x,
-                              oscillators[xc - 1 + zc*xSize].y,
-                              oscillators[xc - 1 + zc*xSize].z);
+                p1 = FVector3(oscillators[xc - 1 + zc*xSize].position.x,
+                              oscillators[xc - 1 + zc*xSize].position.y,
+                              oscillators[xc - 1 + zc*xSize].position.z);
             } else {
-                p1 = FVector3(oscillators[xc + zc*xSize].x,
-                              oscillators[xc + zc*xSize].y,
-                              oscillators[xc + zc*xSize].z);
+                p1 = FVector3(oscillators[xc + zc*xSize].position.x,
+                              oscillators[xc + zc*xSize].position.y,
+                              oscillators[xc + zc*xSize].position.z);
             }
 
             if (xc < xSize - 1) {
-                p2 = FVector3(oscillators[xc + 1 + zc*xSize].x,
-                              oscillators[xc + 1 + zc*xSize].y,
-                              oscillators[xc + 1 + zc*xSize].z);
+                p2 = FVector3(oscillators[xc + 1 + zc*xSize].position.x,
+                              oscillators[xc + 1 + zc*xSize].position.y,
+                              oscillators[xc + 1 + zc*xSize].position.z);
             } else {
-                p2 = FVector3(oscillators[xc + zc*xSize].x,
-                              oscillators[xc + zc*xSize].y,
-                              oscillators[xc + zc*xSize].z);
+                p2 = FVector3(oscillators[xc + zc*xSize].position.x,
+                              oscillators[xc + zc*xSize].position.y,
+                              oscillators[xc + zc*xSize].position.z);
             }
 
             u = p2 - p1; //vector from the left neighbor to the right neighbor
             if (zc > 0) {
-                p1 = FVector3(oscillators[xc + (zc - 1)*xSize].x,
-                              oscillators[xc + (zc - 1)*xSize].y,
-                              oscillators[xc + (zc - 1)*xSize].z);
+                p1 = FVector3(oscillators[xc + (zc - 1)*xSize].position.x,
+                              oscillators[xc + (zc - 1)*xSize].position.y,
+                              oscillators[xc + (zc - 1)*xSize].position.z);
             } else {
-                p1 = FVector3(oscillators[xc + zc*xSize].x,
-                              oscillators[xc + zc*xSize].y,
-                              oscillators[xc + zc*xSize].z);
+                p1 = FVector3(oscillators[xc + zc*xSize].position.x,
+                              oscillators[xc + zc*xSize].position.y,
+                              oscillators[xc + zc*xSize].position.z);
             }
 
             if (zc < zSize - 1) {
-                p2 = FVector3(oscillators[xc + (zc + 1)*xSize].x,
-                              oscillators[xc + (zc + 1)*xSize].y,
-                              oscillators[xc + (zc + 1)*xSize].z);
+                p2 = FVector3(oscillators[xc + (zc + 1)*xSize].position.x,
+                              oscillators[xc + (zc + 1)*xSize].position.y,
+                              oscillators[xc + (zc + 1)*xSize].position.z);
             } else {
-                p2 = FVector3(oscillators[xc + zc*xSize].x,
-                              oscillators[xc + zc*xSize].y,
-                              oscillators[xc + zc*xSize].z);
+                p2 = FVector3(oscillators[xc + zc*xSize].position.x,
+                              oscillators[xc + zc*xSize].position.y,
+                              oscillators[xc + zc*xSize].position.z);
             }
             v = p2 - p1; //vector from the upper neighbor to the lower neighbor
             //calculate the normal:
-            FVector3 normal = u.crossProduct(v).normalize();
+            FVector3 normal = u.cross(v).normalize();
 
             //assign the normal:
             if (normal.y > 0.0) {  //normals always look upward!
-                oscillators[xc + zc*xSize].nx = normal.x;
-                oscillators[xc + zc*xSize].ny = normal.y;
-                oscillators[xc + zc*xSize].nz = normal.z;
+                oscillators[xc + zc*xSize].normal.x = normal.x;
+                oscillators[xc + zc*xSize].normal.y = normal.y;
+                oscillators[xc + zc*xSize].normal.z = normal.z;
             } else {
-                oscillators[xc + zc*xSize].nx = -normal.x;
-                oscillators[xc + zc*xSize].ny = -normal.y;
-                oscillators[xc + zc*xSize].nz = -normal.z;
+                oscillators[xc + zc*xSize].normal.x = -normal.x;
+                oscillators[xc + zc*xSize].normal.y = -normal.y;
+                oscillators[xc + zc*xSize].normal.z = -normal.z;
             }
         }
     }
@@ -211,12 +211,12 @@ void Pool::render() {
     glTexCoordPointer(2,
                       GL_FLOAT,
                       sizeof(Oscillator),
-                      &oscillators[0].u);
+                      &oscillators[0].texX);
 
 
     glNormalPointer(GL_FLOAT,
                     sizeof(Oscillator),
-                    &oscillators[0].nx);  //Pointer to the first normal
+                    &oscillators[0].normal.x);  //Pointer to the first normal
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);

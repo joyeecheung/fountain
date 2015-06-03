@@ -64,10 +64,10 @@ void keyDown(unsigned char key, int x, int y) {
             camera.rotateY(-5.0f);
             break;
         case 'w':
-            camera.moveForwards(-0.15f);
+            camera.moveZ(-0.15f);
             break;
         case 's':
-            camera.moveForwards(0.15f);
+            camera.moveZ(0.15f);
             break;
         case 'x':
             camera.rotateX(5.0f);
@@ -76,10 +76,10 @@ void keyDown(unsigned char key, int x, int y) {
             camera.rotateX(-5.0f);
             break;
         case 'c':
-            camera.strafeRight(-0.05f);
+            camera.moveX(-0.05f);
             break;
         case 'v':
-            camera.strafeRight(0.05f);
+            camera.moveX(0.05f);
             break;
         case 'f':
             camera.move(FVector3(0.0f, -0.1f, 0.0f));
@@ -127,7 +127,7 @@ void renderGround(float minX, float maxX, float minZ, float maxZ) {
     //******************
     //ground
     //******************
-    groundTexture.setActive();
+    groundTexture.bind();
     glBegin(GL_QUADS);
 
     glNormal3f(0.0f, 1.0f, 0.0);
@@ -147,7 +147,7 @@ void drawScene(void) {
     //Render the pool
     glEnable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
-    waterTexture.setActive();
+    waterTexture.bind();
     glPushMatrix();
     glTranslatef(0.0f, POOL_HEIGHT, 0.0f);
     pool.render();

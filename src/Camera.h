@@ -1,32 +1,35 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include <gl\glut.h>
 #include "FVector.h"
 
-//Note: All angles in degrees
-
+/* Note: angles are in [0, 90]
+ */
 class Camera {
-private:
-    FVector3 position;
-    FVector3 viewDir;		/*Not used for rendering the camera, but for "moveforwards"
-                            So it is not necessary to "actualize" it always. It is only
-                            actualized when ViewDirChanged is true and moveforwards is called*/
-    bool viewDirChanged;
-    GLfloat rotatedX, rotatedY, rotatedZ;
-    void getViewDir(void);
 public:
-    //inits the values (Position: (0|0|0) Target: (0|0|-1) )
     Camera() : position(0.0f, 0.0f, 0.0f),
-               viewDir(0.0f, 0.0f, -1.0f),
-               viewDirChanged(false),
-               rotatedX(0.0f), rotatedY(0.0f), rotatedZ(0.0f){
-    }
-
-    void render(void);	//executes some glRotates and a glTranslate command
-    //Note: You should call glLoadIdentity before using Render
+               direction(0.0f, 0.0f, -1.0f),
+               directionChanged(false),
+               rotation(0.0f, 0.0f, 0.0f) {}
+    /* Executes glRotate and glTranslate.
+       Should be called after calling glLoadIdentity. */
+    void render(void) const;
     void move(FVector3 direction);
+    void moveZ(GLfloat distance);
+    void moveX(GLfloat distance);
+    void rotate(FVector3 angles);
     void rotateX(GLfloat angle);
     void rotateY(GLfloat angle);
     void rotateZ(GLfloat angle);
-    void rotateXYZ(FVector3 angles);
-    void moveForwards(GLfloat distance);
-    void strafeRight(GLfloat distance);
+private:
+    FVector3 position;
+    /* needs to mark the update by setting directionChanged to true
+       before calling any move function */
+    FVector3 direction; 
+    bool directionChanged;
+    FVector3 rotation;
+    void updateDirection(void);
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef FOUNTAIN_H
+#define FOUNTAIN_H
+
 #include "FVector.h"
 #include "Pool.h"
 
@@ -38,3 +41,5 @@ public:
                     GLfloat acceleration);
     void destroy();
 };
+
+#endif

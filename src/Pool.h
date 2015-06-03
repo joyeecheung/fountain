@@ -2,11 +2,12 @@
 #define POOL_H
 
 #include <gl\glut.h>
+#include "FVector.h"
 
 struct Oscillator {
-    GLfloat x, y, z;     //position
-    GLfloat nx, ny, nz;  //normal vector
-    GLfloat u, v;	   //texture coordinates
+    FVector3 position;
+    FVector3 normal;
+    GLfloat texX, texY;  // texture coordinates
 
     GLfloat upSpeed;
     GLfloat newY;
@@ -14,7 +15,7 @@ struct Oscillator {
 
 class Pool {
 protected:
-    //vertex data for the waves:
+    // vertex data for the waves:
     Oscillator * oscillators;
     GLuint * indices;
 
