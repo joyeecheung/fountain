@@ -8,13 +8,7 @@ class Ground {
 public:
     Ground() {}
     void initialize(float minX, float maxX,
-                    float minZ, float maxZ, Texture *groundTexture) {
-        this->minX = minX;
-        this->maxX = maxX;
-        this->minZ = minZ;
-        this->maxZ = maxZ;
-        this->groundTexture = groundTexture;
-    }
+                    float minZ, float maxZ, Texture *groundTexture);
     void render();
 private:
     float minX;
@@ -22,6 +16,7 @@ private:
     float minZ;
     float maxZ;
     Texture *groundTexture;
+    GLuint listIdx;
 };
 
 #endif

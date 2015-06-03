@@ -10,7 +10,7 @@ public:
     int getWidth() const;
     int getHeight() const;
     unsigned int getID() const;
-    void load(char *filename);
+    void load(char *filename, int mode = BMP_DEFAULT);
     void bind();
 private:
     int width, height;

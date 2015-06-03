@@ -1,11 +1,11 @@
 #include "Texture.h"
 
-void Texture::load(char *filename) {
+void Texture::load(char *filename, int mode) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
 
-    FIBITMAP *bitmap = FreeImage_Load(FIF_BMP, filename, BMP_DEFAULT);
+    FIBITMAP *bitmap = FreeImage_Load(FIF_BMP, filename, mode);
     width = FreeImage_GetWidth(bitmap);
     height = FreeImage_GetHeight(bitmap);
 

@@ -1,8 +1,19 @@
 #include "Basin.h"
 
-void Basin::render() {
-    texture->bind();
+void Basin::initialize(const float height, const float borderWidth,
+                const float innerSizeX, const float innerSizeZ,
+                Texture *texture) {
+    this->height = height;
+    this->borderWidth = borderWidth;
+    this->innerSizeX = innerSizeX;
+    this->innerSizeZ = innerSizeZ;
+    this->texBorder = borderWidth / (innerSizeX + 2 * borderWidth);
+    this->texture = texture;
 
+    this->listIdx = glGenLists(1);
+    glNewList(listIdx, GL_COMPILE);
+
+    texture->bind();
     glBegin(GL_QUADS);
 
     //******************
@@ -139,4 +150,9 @@ void Basin::render() {
     glVertex3f(innerSizeX + borderWidth, 0.0f, innerSizeZ + borderWidth);
 
     glEnd();
+    glEndList();
+}
+
+void Basin::render() {
+    glCallList(listIdx);
 }
