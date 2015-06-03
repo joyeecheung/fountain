@@ -210,7 +210,6 @@ void Pool::update(float deltaTime) {
 
 }
 
-
 void Pool::render() {
     floorTexture->bind();
     // There might be more vertex arrays.

@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <cstdio>
 
-
 #include "Pool.h"
 #include "Fountain.h"
 #include "Basin.h"
@@ -15,21 +14,31 @@
 #include "Ground.h"
 
 //lighting:
-GLfloat LightAmbient[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-GLfloat LightDiffuse[] = { 0.8f, 0.8f, 0.8f, 0.0f };
-GLfloat LightPosition[] = { 1.0f, -0.5f, -0.5f, 0.0f };
+GLfloat lightAmbient[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 0.0f };
+GLfloat lightPosition[] = { 1.0f, -0.5f, -0.5f, 0.0f };
 
 //Constants:
-#define NUM_X_OSCILLATORS		170
-#define NUM_Z_OSCILLATORS		170
-#define OSCILLATOR_DISTANCE		0.020f
-#define OSCILLATOR_WEIGHT       0.00008f
+const int NUM_X_OSCILLATORS = 170;
+const int NUM_Z_OSCILLATORS = 170;
+const float OSCILLATOR_DISTANCE = 0.020f;
+const float OSCILLATOR_WEIGHT = 0.00005f;
+const float MAXX = (NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE);
+const float MAXZ = (NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE);
+const float POOL_HEIGHT = 0.3f;
+const float MOVE_FACTOR = 0.1f;
+const float ROTATE_FACTOR = 1.0f;
 
-#define MAXX					(NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE)
-#define MAXZ					(NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE)
-
-#define POOL_HEIGHT				0.3f
-
+FountainInitializer initializers[] = {
+    FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.10f),  // 1
+    FountainInitializer(1, 20, 100, 70.0f, 70.0f, 5.0f, 0.12f),  // 2
+    FountainInitializer(1, 20, 200, 85.0f, 85.0f, 10.0f, 0.08f), // 3
+    FountainInitializer(5, 20, 85, 90.0f, 90.0f, 1.0f, 0.12f), // 4
+    FountainInitializer(2, 20, 50, 40.0f, 70.0f, 1.5f, 0.15f), // 5
+    FountainInitializer(3, 50, 25, 76.0f, 90.0f, 0.2f, 0.08f), // 6
+    FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.10f), // 7
+    FountainInitializer(3, 50, 25, 76.0f, 90.0f, 0.2f, 0.08f) // 8
+};
 
 //Camera object:
 Camera camera;
@@ -55,65 +64,48 @@ void keyDown(unsigned char key, int x, int y) {
             exit(0);
             break;
         case 'a':
-            camera.rotateY(5.0f);
+            camera.rotateY(ROTATE_FACTOR);
             break;
         case 'd':
-            camera.rotateY(-5.0f);
+            camera.rotateY(-ROTATE_FACTOR);
             break;
         case 'w':
-            camera.moveZ(-0.15f);
+            camera.moveZ(-MOVE_FACTOR);
             break;
         case 's':
-            camera.moveZ(0.15f);
+            camera.moveZ(MOVE_FACTOR);
             break;
         case 'x':
-            camera.rotateX(5.0f);
+            camera.rotateX(ROTATE_FACTOR);
             break;
         case 'y':
-            camera.rotateX(-5.0f);
+            camera.rotateX(-ROTATE_FACTOR);
             break;
         case 'c':
-            camera.moveX(-0.05f);
+            camera.moveX(-MOVE_FACTOR);
             break;
         case 'v':
-            camera.moveX(0.05f);
+            camera.moveX(MOVE_FACTOR);
             break;
         case 'f':
-            camera.move(FVector3(0.0f, -0.1f, 0.0f));
+            camera.move(FVector3(0.0f, -MOVE_FACTOR, 0.0f));
             break;
         case 'r':
-            camera.move(FVector3(0.0f, 0.1f, 0.0f));
+            camera.move(FVector3(0.0f, MOVE_FACTOR, 0.0f));
             break;
 
             //*************************************
             //Several initialization calls:
         case '1':
-            pool.reset();
-            fountain.initialize(3, 50, 25, 76.0f, 90.0f, 0.2f, 0.08f);
-            break;
         case '2':
-            pool.reset();
-            fountain.initialize(1, 20, 100, 70.0f, 70.0f, 5.0f, 0.12f);
-            break;
         case '3':
-            pool.reset();
-            fountain.initialize(1, 20, 200, 85.0f, 85.0f, 10.0f, 0.08f);
-            break;
         case '4':
-            pool.reset();
-            fountain.initialize(5, 20, 85, 90.0f, 90.0f, 1.0f, 0.12f);
-            break;
         case '5':
-            pool.reset();
-            fountain.initialize(2, 20, 50, 40.0f, 70.0f, 1.5f, 0.15f);
-            break;
         case '6':
-            pool.reset();
-            fountain.initialize(3, 50, 25, 76.0f, 90.0f, 0.2f, 0.10f);
-            break;
         case '7':
+        case '8':
             pool.reset();
-            fountain.initialize(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.10f);
+            fountain.initialize(initializers[key - '0' - 1]);
             break;
     }
 }
@@ -151,7 +143,7 @@ void display(void) {
 
     camera.render();
 
-    glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
     //Turn two sided lighting on:
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
@@ -176,7 +168,7 @@ void reshape(int x, int y) {
 
 void idle(void) {
     //Do the physical calculation for one step:
-    float dtime = 0.003f;
+    float dtime = 0.002f;
     fountain.update(dtime, &pool);
     pool.update(dtime);
 
@@ -207,7 +199,7 @@ int main(int argc, char **argv) {
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
                     0.03f, 4.0f, 4.0f, &waterTexture);
     //init the airfountain: (look at KeyDown() to see more possibilities of initialization)
-    fountain.initialize(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.10f);
+    fountain.initialize(initializers[0]);
     basin.initialize(0.2f + POOL_HEIGHT, 0.4f, MAXX, MAXZ, &rockTexture);
     ground.initialize(-20.0f, 20.0f, -20.0f, 20.0f, &groundTexture);
 
@@ -231,9 +223,9 @@ int main(int argc, char **argv) {
 
     //Initialize lighting:
     g_bLighting = true;
-    glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
-    glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
+    glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
     glEnable(GL_LIGHT1);
 
     glEnable(GL_LIGHTING);

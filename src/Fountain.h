@@ -4,50 +4,78 @@
 #include "FVector.h"
 #include "Pool.h"
 
-/**
-
-  "Air fountain" is the description for the fountain's water in the air.
-  The rest, which is most of the water, resists in the bowl.
-
-  **/
+class FountainInitializer {
+public:
+    FountainInitializer(GLint levels, GLint raysPerStep, GLint dropsPerRay,
+                        GLfloat angleMin, GLfloat angleMax,
+                        GLfloat randomAngle, GLfloat acceleration) {
+        this->levels = levels;
+        this->raysPerStep = raysPerStep;
+        this->dropsPerRay = dropsPerRay;
+        this->angleMin = angleMin;
+        this->angleMax = angleMax;
+        this->randomAngle = randomAngle;
+        this->acceleration = acceleration;
+    }
+    GLint levels;
+    GLint raysPerStep;
+    GLint dropsPerRay;
+    GLfloat angleMin;
+    GLfloat angleMax;
+    GLfloat randomAngle;
+    GLfloat acceleration;
+};
 
 class Fountain;
 
 class Drop {
+public:
+    void setSpeed(FVector3 newSpeed);
+    void setAcceleration(GLfloat newAcc);
+    void setTime(GLfloat newTime);
+    void updatePosition(FVector3 & positionVertex, float dtime,
+                        Pool * pool, Fountain * fountain);
 private:
     GLfloat time;  //How many steps the drop was "outside", when it falls into the water, time is set back to 0
-    FVector3 constantSpeed;  //See the fountain doc for explanation of the physics
-    GLfloat accFactor;
-public:
-    void setConstantSpeed(FVector3 newSpeed);
-    void setAccFactor(GLfloat newAccFactor);
-    void setTime(GLfloat newTime);
-    void getNewPosition(FVector3 *positionVertex, float dtime, Pool * pPool, Fountain * pFountain);
+    FVector3 speed;  //See the fountain doc for explanation of the physics
+    GLfloat acc;
 };
 
 class Fountain {
 public:
-    Fountain() : fountainVertices(nullptr), fountainDrops(nullptr) {}
-    Fountain(GLint steps, GLint raysPerStep, GLint dropsPerRay,
-             GLfloat stepAngleMin, GLfloat stepAngleMax,
+    Fountain() : vertices(nullptr), drops(nullptr) {}
+
+    Fountain(GLint levels, GLint raysPerStep, GLint dropsPerRay,
+             GLfloat angleMin, GLfloat angleMax,
              GLfloat randomAngle, GLfloat acceleration)
-             : fountainVertices(nullptr), fountainDrops(nullptr) {}
-    void initialize(GLint steps, GLint raysPerStep, GLint dropsPerRay,
-                    GLfloat stepAngleMin,
-                    GLfloat stepAngleMax,
+             : vertices(nullptr), drops(nullptr) {
+        initialize(levels, raysPerStep, dropsPerRay, angleMin, angleMax,
+                   randomAngle, acceleration);
+    }
+
+    void initialize(GLint levels, GLint raysPerStep, GLint dropsPerRay,
+                    GLfloat angleMin,
+                    GLfloat angleMax,
                     GLfloat randomAngle,
                     GLfloat acceleration);
-    FVector3 position;
+
+    void initialize(FountainInitializer init) {
+        initialize(init.levels, init.raysPerStep, init.dropsPerRay, init.angleMin,
+                   init.angleMax, init.randomAngle, init.acceleration);
+    }
+    
     void render();
     void update(float dtime, Pool * pPool);
-    GLint numDrops;
     ~Fountain() {
-        delete [] fountainDrops;
-        delete [] fountainVertices;
+        delete [] drops;
+        delete [] vertices;
     }
+
+    GLint numDrops;
+    FVector3 position;
 private:
-    FVector3 * fountainVertices;
-    Drop * fountainDrops;
+    FVector3 * vertices;
+    Drop * drops;
 };
 
 #endif

@@ -2,32 +2,32 @@
 #include <cmath>
 #include "Fountain.h"
 
-#define RandomFactor 2.0f
+#define RAND_FACTOR 2.0f
 
 GLfloat randf(GLfloat range) {
-    return (GLfloat)rand() / (GLfloat)RAND_MAX * range * RandomFactor;
+    return (GLfloat)rand() / (GLfloat)RAND_MAX * range * RAND_FACTOR;
 }
 
-void Drop::setConstantSpeed(FVector3 newSpeed) {
-    constantSpeed = newSpeed;
+void Drop::setSpeed(FVector3 newSpeed) {
+    speed = newSpeed;
 }
 
-void Drop::setAccFactor(GLfloat newAccFactor) {
-    accFactor = newAccFactor;
+void Drop::setAcceleration(GLfloat newAcc) {
+    acc = newAcc;
 }
 
 void Drop::setTime(GLfloat newTime) {
     time = newTime;
 }
 
-void Drop::getNewPosition(FVector3 * positionVertex, float dtime,
-                           Pool * pPool, Fountain *pFountain) {
+void Drop::updatePosition(FVector3 & vertex, float dtime,
+                           Pool * pool, Fountain *fountain) {
     time += dtime * 20.0f;
     if (time > 0.0f) {
-        FVector3 position(constantSpeed.x * time,
-                          constantSpeed.y * time - accFactor * time * time,
-                          constantSpeed.z * time);
-        *positionVertex = position;
+        FVector3 position(speed.x * time,
+                          speed.y * time - acc * time * time,
+                          speed.z * time);
+        vertex = position;
         if (position.y < 0.0) {
             /* the drop has fallen into the water. The problem is now that we cannot
                 set time to 0.0, because if there are more "DropsPerRay"
@@ -37,73 +37,75 @@ void Drop::getNewPosition(FVector3 * positionVertex, float dtime,
             time = time - int(time);
             if (time > 0.0) time -= 1.0;
 
-            //The drop creates a little wave in the pool:
-            float distance = pPool->getODistance();
-            int oscillatorX = (int)((position.x + pFountain->position.x) / distance);
-            int oscillatorZ = (int)((position.z + pFountain->position.z) / distance);
-            pPool->updateOscillator(oscillatorX, oscillatorZ, -0.1f);  //change this to make the waves stronger/weaker
+            // The drop creates a little wave in the pool:
+            float distance = pool->getODistance();
+            int oX = (int)((position.x + fountain->position.x) / distance);
+            int oZ = (int)((position.z + fountain->position.z) / distance);
+            // change this to make the waves stronger/weaker
+            pool->updateOscillator(oX, oZ, -0.1f);
         }
     } else {
-        positionVertex->set(0.0f, 0.0f, 0.0f);
+        vertex.set(0.0f, 0.0f, 0.0f);
     }
 }
 
 /********************************************************************/
 
 
-void Fountain::initialize(GLint steps, GLint raysPerStep, GLint dropsPerRay,
-                              GLfloat angleOfDeepestStep,
-                              GLfloat angleOfHighestStep,
-                              GLfloat randomAngleAddition,
-                              GLfloat accFactor) {
+void Fountain::initialize(GLint levels, GLint raysPerStep, GLint dropsPerRay,
+                              GLfloat angleMin,
+                              GLfloat angleMax,
+                              GLfloat randomAngle,
+                              GLfloat acceleration) {
     //This function needn't be and isn't speed optimized
 
-    numDrops = steps * raysPerStep * dropsPerRay;
+    numDrops = levels * raysPerStep * dropsPerRay;
 
-    if (fountainDrops != nullptr) delete [] fountainDrops;
-    if (fountainVertices != nullptr) delete [] fountainVertices;
-    fountainDrops = new Drop[numDrops];
-    fountainVertices = new FVector3[numDrops];
-    FVector3 newSpeed;
-    GLfloat dropAccFactor; //different from AccFactor because of the random change
-    GLfloat timeNeeded;
-    GLfloat stepAngle; //Angle, which the ray gets out of the fountain with
-    GLfloat rayAngle;	//Angle you see when you look down on the fountain
-    GLint i, j, k;
+    if (drops != nullptr) delete [] drops;
+    if (vertices != nullptr) delete [] vertices;
+    drops = new Drop[numDrops];
+    vertices = new FVector3[numDrops];
+    GLfloat randAcc; // acceleration changed randomly
+    GLfloat initialTime;  // initial elapsed time for each drop
+    FVector3 initialSpeed;  // initial speed for each drop
+    GLfloat angleZ; // angle in the front view
+    GLfloat angleY;  // angle in the top view
 
-    for (k = 0; k < steps; k++) {
-        for (j = 0; j < raysPerStep; j++) {
-            for (i = 0; i < dropsPerRay; i++) {
-                dropAccFactor = accFactor + randf(0.005f);
-                if (steps > 1) {
-                    stepAngle = angleOfDeepestStep + (angleOfHighestStep - angleOfDeepestStep)
-                    *GLfloat(k) / (steps - 1) + randf(randomAngleAddition);
+    for (int k = 0; k < levels; k++) {
+        for (int j = 0; j < raysPerStep; j++) {
+            for (int i = 0; i < dropsPerRay; i++) {
+                randAcc = acceleration + randf(0.005f);
+                if (levels > 1) {
+                    angleZ = angleMin + (angleMax - angleMin)
+                    *GLfloat(k) / (levels - 1) + randf(randomAngle);
                 } else {
-                    stepAngle = angleOfDeepestStep + randf(randomAngleAddition);
+                    angleZ = angleMin + randf(randomAngle);
                 }
 
-                //This is the speed caused by the step:
-                newSpeed.x = cos(stepAngle * PI / 180.0) * (0.2 + 0.04 * k);
-                newSpeed.y = sin(stepAngle * PI / 180.0) * (0.2 + 0.04 * k);
+                // speed update by levels
+                initialSpeed.x = cos(angleZ * PI / 180.0) * (0.2 + 0.04 * k);
+                initialSpeed.y = sin(angleZ * PI / 180.0) * (0.2 + 0.04 * k);
 
-                //This is the speed caused by the ray:
-                rayAngle = (GLfloat)j / (GLfloat)raysPerStep * 360.0f + 12.0f;  //+12.0 causes a rotation (12?
+                // speed update by rays
+                // +12.0 causes a rotation (12?
+                angleY = (GLfloat)j / (GLfloat)raysPerStep * 360.0f + 12.0f;
 
-                //for the next computations "NewSpeed.x" is the radius. Care! Dont swap the two
-                //lines, because the second one changes NewSpeed.x!
-                newSpeed.z = newSpeed.x * sin(rayAngle * PI / 180.0);
-                newSpeed.x = newSpeed.x * cos(rayAngle * PI / 180.0);
+                // for the next computations "newSpeed.x" is the radius.
+                // DON'T swap the two lines, because the second one changes newSpeed.x
+                initialSpeed.z = initialSpeed.x * sin(angleY * PI / 180.0);
+                initialSpeed.x = initialSpeed.x * cos(angleY * PI / 180.0);
 
-                newSpeed.x *= 3.0f;
-                newSpeed.y *= 3.0f;
-                newSpeed.z *= 3.0f;
+                initialSpeed.x *= 3.0f;
+                initialSpeed.y *= 3.0f;
+                initialSpeed.z *= 3.0f;
 
-                //Calculate how many steps are required, that a drop comes out and falls down again
-                timeNeeded = newSpeed.y / dropAccFactor;
+                // Calculate how many levels are required
+                // that a drop comes out and falls down again
+                initialTime = initialSpeed.y / randAcc;
                 int idx = i + j * dropsPerRay + k * dropsPerRay * raysPerStep;
-                fountainDrops[idx].setConstantSpeed(newSpeed);
-                fountainDrops[idx].setAccFactor(dropAccFactor);
-                fountainDrops[idx].setTime(timeNeeded * i / dropsPerRay);
+                drops[idx].setSpeed(initialSpeed);
+                drops[idx].setAcceleration(randAcc);
+                drops[idx].setTime(initialTime * i / dropsPerRay);
             }
         }
     }
@@ -112,7 +114,7 @@ void Fountain::initialize(GLint steps, GLint raysPerStep, GLint dropsPerRay,
 
 void Fountain::update(float dtime, Pool * pPool) {
     for (int i = 0; i < numDrops; i++)
-        fountainDrops[i].getNewPosition(&fountainVertices[i], dtime, pPool, this);
+        drops[i].updatePosition(vertices[i], dtime, pPool, this);
 }
 
 void Fountain::render() {
@@ -120,15 +122,13 @@ void Fountain::render() {
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
 
-    glVertexPointer(3,			//x,y,z-components
-                    GL_FLOAT,	//data type of SVertex
-                    0,			//the vertices are tightly packed
-                    fountainVertices);
+    glVertexPointer(3,          // x, y, z-components
+                    GL_FLOAT,   // data type of SVertex
+                    0,         // the vertices are tightly packed
+                    vertices);
     glPushMatrix();
     glTranslatef(position.x, position.y, position.z);
-    glDrawArrays(GL_POINTS,
-                 0,
-                 numDrops);
+    glDrawArrays(GL_POINTS, 0, numDrops);
 
     glPopMatrix();
 }
