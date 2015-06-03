@@ -11,12 +11,17 @@
 #include "Camera.h"  //This is my old camera, but it's easier to control 
 //for the user and the third rotation axis is not required here
 #include "Texture.h"
+#include "SkyBox.h"
 #include "Ground.h"
 
 //lighting:
 GLfloat lightAmbient[] = { 0.2f, 0.2f, 0.2f, 0.0f };
 GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 0.0f };
-GLfloat lightPosition[] = { 1.0f, -0.5f, -0.5f, 0.0f };
+GLfloat lightPosition[] = {0.8f, 0.4f, -0.5f, 0.0f };
+
+GLfloat lightAmbient2[] = { 0.1f, 0.1f, 0.1f, 0.0f };
+GLfloat lightDiffuse2[] = { 0.3f, 0.3f, 0.3f, 0.0f };
+GLfloat lightPosition2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
 
 //Constants:
 const int NUM_X_OSCILLATORS = 170;
@@ -25,7 +30,7 @@ const float OSCILLATOR_DISTANCE = 0.020f;
 const float OSCILLATOR_WEIGHT = 0.00005f;
 const float MAXX = (NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE);
 const float MAXZ = (NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE);
-const float POOL_HEIGHT = 0.3f;
+const float POOL_HEIGHT = 0.2f;
 const float MOVE_FACTOR = 0.1f;
 const float ROTATE_FACTOR = 1.0f;
 
@@ -51,6 +56,8 @@ Fountain fountain;
 
 // The basin of the foutain
 Basin basin;
+
+Skybox skybox;
 
 Ground ground;
 
@@ -125,7 +132,7 @@ void drawScene(void) {
     
     // render the ground
     ground.render();
-
+    skybox.render();
     glDisable(GL_TEXTURE_2D);
 
     //Render the water in the air.
@@ -189,11 +196,20 @@ int main(int argc, char **argv) {
     //but it is applied to the water
     Texture rockTexture;
     Texture groundTexture;
+    Texture skyboxTextures[5];
+
     //Load the textures:
     waterTexture.load("resource/pebbles.bmp");
     rockTexture.load("resource/wall.bmp");
     groundTexture.load("resource/grass.bmp");
 
+    skyboxTextures[SKY_FRONT].load("resource/skybox/front.bmp", GL_CLAMP_TO_EDGE);
+    skyboxTextures[SKY_RIGHT].load("resource/skybox/right.bmp", GL_CLAMP_TO_EDGE);
+    skyboxTextures[SKY_LEFT].load("resource/skybox/left.bmp", GL_CLAMP_TO_EDGE);
+    skyboxTextures[SKY_BACK].load("resource/skybox/back.bmp", GL_CLAMP_TO_EDGE);
+    skyboxTextures[SKY_UP].load("resource/skybox/up.bmp", GL_CLAMP_TO_EDGE);
+
+    skybox.initialize(-20.0f, 20.0f, 0.0f, 10.0f, -20.0f, 20.0f, skyboxTextures);
     //compute the vertices and indices
     pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS,
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
@@ -227,6 +243,11 @@ int main(int argc, char **argv) {
     glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
     glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
     glEnable(GL_LIGHT1);
+
+    glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
+    glLightfv(GL_LIGHT2, GL_POSITION, lightPosition2);
+    glEnable(GL_LIGHT2);
 
     glEnable(GL_LIGHTING);
 
