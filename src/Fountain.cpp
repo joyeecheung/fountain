@@ -121,7 +121,7 @@ void Fountain::render() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
-
+    glPointSize(2.0);
     glVertexPointer(3,          // x, y, z-components
                     GL_FLOAT,   // data type of SVertex
                     0,         // the vertices are tightly packed

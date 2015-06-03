@@ -24,8 +24,8 @@ GLfloat lightDiffuse2[] = { 0.3f, 0.3f, 0.3f, 0.0f };
 GLfloat lightPosition2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
 
 //Constants:
-const int NUM_X_OSCILLATORS = 170;
-const int NUM_Z_OSCILLATORS = 170;
+const int NUM_X_OSCILLATORS = 180;
+const int NUM_Z_OSCILLATORS = 180;
 const float OSCILLATOR_DISTANCE = 0.020f;
 const float OSCILLATOR_WEIGHT = 0.00005f;
 const float MAXX = (NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE);
@@ -35,14 +35,14 @@ const float MOVE_FACTOR = 0.1f;
 const float ROTATE_FACTOR = 1.0f;
 
 FountainInitializer initializers[] = {
-    FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.10f),  // 1
-    FountainInitializer(1, 20, 100, 70.0f, 70.0f, 5.0f, 0.12f),  // 2
-    FountainInitializer(1, 20, 200, 85.0f, 85.0f, 10.0f, 0.08f), // 3
-    FountainInitializer(5, 20, 85, 90.0f, 90.0f, 1.0f, 0.12f), // 4
-    FountainInitializer(2, 20, 50, 40.0f, 70.0f, 1.5f, 0.15f), // 5
-    FountainInitializer(3, 50, 25, 76.0f, 90.0f, 0.2f, 0.08f), // 6
-    FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.10f), // 7
-    FountainInitializer(3, 50, 25, 76.0f, 90.0f, 0.2f, 0.08f) // 8
+    FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.09f),  // 1
+    FountainInitializer(4, 100, 8, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
+    FountainInitializer(2, 70, 40, 40.0f, 85.0f, 1.5f, 0.13f), // 3
+    FountainInitializer(3, 5, 200, 75.0f, 90.0f, 0.4f, 0.07f), // 4
+    FountainInitializer(3, 100, 45, 20.0f, 90.0f, 0.2f, 0.15f), // 5
+    FountainInitializer(1, 20, 100, 50.0f, 60.0f, 5.0f, 0.13f), // 6
+    FountainInitializer(6, 20, 90, 90.0f, 90.0f, 1.0f, 0.12f), // 7
+    FountainInitializer(2, 30, 200, 85.0f, 85.0f, 10.0f, 0.08f)// 8
 };
 
 //Camera object:
@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(1000, 600);
     //Create a window with rendering context and everything else we need
-    glutCreateWindow("Fountain with simulated water");
+    glutCreateWindow("Fountain");
 
     //Textures:
     Texture waterTexture;  //the image does not contain a water texture, 
@@ -225,7 +225,8 @@ int main(int argc, char **argv) {
                                  POOL_HEIGHT,
                                  MAXZ / 2.0f);
     //initialize camera: 
-    camera.move(FVector3(MAXX / 2.0f, 2.0f, MAXX + 5.0f));
+    camera.move(FVector3(MAXX / 2.0f, 1.8f, MAXZ + 3.5f));
+    camera.rotateY(0);
     camera.rotateX(-5);
 
     //Enable the vertex array functionality:
@@ -261,8 +262,8 @@ int main(int argc, char **argv) {
 
     //Initialize blending:
     glEnable(GL_BLEND);
-    glPointSize(3.0);
     glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_POLYGON_SMOOTH);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //initialize generation of random numbers:
