@@ -38,10 +38,10 @@ void Drop::getNewPosition(FVector3 * positionVertex, float dtime,
             if (time > 0.0) time -= 1.0;
 
             //The drop creates a little wave in the pool:
-            float distance = pPool->getOscillatorDistance();
+            float distance = pPool->getODistance();
             int oscillatorX = (int)((position.x + pFountain->position.x) / distance);
             int oscillatorZ = (int)((position.z + pFountain->position.z) / distance);
-            pPool->affectOscillator(oscillatorX, oscillatorZ, -0.1f);  //change this to make the waves stronger/weaker
+            pPool->updateOscillator(oscillatorX, oscillatorZ, -0.1f);  //change this to make the waves stronger/weaker
         }
     } else {
         positionVertex->set(0.0f, 0.0f, 0.0f);
