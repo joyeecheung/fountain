@@ -12,6 +12,7 @@
 #include "Camera.h"  //This is my old camera, but it's easier to control 
 //for the user and the third rotation axis is not required here
 #include "Texture.h"
+#include "Ground.h"
 
 //lighting:
 GLfloat LightAmbient[] = { 0.2f, 0.2f, 0.2f, 0.0f };
@@ -42,11 +43,7 @@ Fountain fountain;
 // The basin of the foutain
 Basin basin;
 
-//Textures:
-Texture waterTexture;  //the image does not contain a water texture, 
-//but it is applied to the water
-Texture rockTexture;
-Texture groundTexture;
+Ground ground;
 
 bool  g_bRain = true;
 bool  g_bFillModePoints = true;
@@ -92,12 +89,10 @@ void keyDown(unsigned char key, int x, int y) {
             //Several initialization calls:
         case '1':
             pool.reset();
-            fountain.destroy();
             fountain.initialize(3, 50, 25, 76.0f, 90.0f, 0.2f, 0.08f);
             break;
         case '2':
             pool.reset();
-            fountain.destroy();
             fountain.initialize(1, 20, 100, 70.0f, 70.0f, 5.0f, 0.12f);
             break;
         case '3':
@@ -123,31 +118,11 @@ void keyDown(unsigned char key, int x, int y) {
     }
 }
 
-void renderGround(float minX, float maxX, float minZ, float maxZ) {
-    //******************
-    //ground
-    //******************
-    groundTexture.bind();
-    glBegin(GL_QUADS);
-
-    glNormal3f(0.0f, 1.0f, 0.0);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(minX, 0.0, minZ);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(maxX, 0.0, minZ);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(maxX, 0.0, maxZ);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(minX, 0.0, maxZ);
-    glEnd();
-}
-
 void drawScene(void) {
 
     //Render the pool
     glEnable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
-    waterTexture.bind();
     glPushMatrix();
     glTranslatef(0.0f, POOL_HEIGHT, 0.0f);
     pool.render();
@@ -157,7 +132,7 @@ void drawScene(void) {
     basin.render();
     
     // render the ground
-    renderGround(-20.0f, 20.0f, -20.0f, 20.0f);
+    ground.render();
 
     glDisable(GL_TEXTURE_2D);
 
@@ -217,6 +192,11 @@ int main(int argc, char **argv) {
     //Create a window with rendering context and everything else we need
     glutCreateWindow("Fountain with simulated water");
 
+    //Textures:
+    Texture waterTexture;  //the image does not contain a water texture, 
+    //but it is applied to the water
+    Texture rockTexture;
+    Texture groundTexture;
     //Load the textures:
     waterTexture.load("resource/pebbles.bmp");
     rockTexture.load("resource/wall.bmp");
@@ -225,10 +205,11 @@ int main(int argc, char **argv) {
     //compute the vertices and indices
     pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS,
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
-                    0.03f, 4.0f, 4.0f);
+                    0.03f, 4.0f, 4.0f, &waterTexture);
     //init the airfountain: (look at KeyDown() to see more possibilities of initialization)
     fountain.initialize(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.10f);
     basin.initialize(0.2f + POOL_HEIGHT, 0.4f, MAXX, MAXZ, &rockTexture);
+    ground.initialize(-20.0f, 20.0f, -20.0f, 20.0f, &groundTexture);
 
     //place it in the center of the pool:
     fountain.position = FVector3(MAXX / 2.0f,
@@ -288,9 +269,6 @@ int main(int argc, char **argv) {
     glutIdleFunc(idle);
     //Let GLUT get the msgs
     glutMainLoop();
-
-    //Clean up:
-    fountain.destroy();
 
     return 0;
 }

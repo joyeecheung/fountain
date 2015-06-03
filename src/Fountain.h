@@ -26,20 +26,28 @@ public:
 };
 
 class Fountain {
-protected:
-    FVector3 * fountainVertices;
-    Drop * fountainDrops;
 public:
-    FVector3 position;
-    void render();
-    void update(float dtime, Pool * pPool);
-    GLint numDrops;
+    Fountain() : fountainVertices(nullptr), fountainDrops(nullptr) {}
+    Fountain(GLint steps, GLint raysPerStep, GLint dropsPerRay,
+             GLfloat stepAngleMin, GLfloat stepAngleMax,
+             GLfloat randomAngle, GLfloat acceleration)
+             : fountainVertices(nullptr), fountainDrops(nullptr) {}
     void initialize(GLint steps, GLint raysPerStep, GLint dropsPerRay,
                     GLfloat stepAngleMin,
                     GLfloat stepAngleMax,
                     GLfloat randomAngle,
                     GLfloat acceleration);
-    void destroy();
+    FVector3 position;
+    void render();
+    void update(float dtime, Pool * pPool);
+    GLint numDrops;
+    ~Fountain() {
+        delete [] fountainDrops;
+        delete [] fountainVertices;
+    }
+private:
+    FVector3 * fountainVertices;
+    Drop * fountainDrops;
 };
 
 #endif

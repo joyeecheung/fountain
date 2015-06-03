@@ -60,6 +60,8 @@ void Fountain::initialize(GLint steps, GLint raysPerStep, GLint dropsPerRay,
 
     numDrops = steps * raysPerStep * dropsPerRay;
 
+    if (fountainDrops != nullptr) delete [] fountainDrops;
+    if (fountainVertices != nullptr) delete [] fountainVertices;
     fountainDrops = new Drop[numDrops];
     fountainVertices = new FVector3[numDrops];
     FVector3 newSpeed;
@@ -129,9 +131,4 @@ void Fountain::render() {
                  numDrops);
 
     glPopMatrix();
-}
-
-void Fountain::destroy() {
-    delete[] fountainDrops;
-    delete[] fountainVertices;
 }

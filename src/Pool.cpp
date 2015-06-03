@@ -7,7 +7,8 @@ using namespace std;
 
 void Pool::initialize(int sizeX, int sizeZ, float oDistance,
                       float oWeight, float damping,
-                      float texSizeX, float texSizeZ) {
+                      float texSizeX, float texSizeZ,
+                      Texture * floorTexture) {
     //assign member variables
     this->sizeX = sizeX;
     this->sizeZ = sizeZ;
@@ -15,11 +16,13 @@ void Pool::initialize(int sizeX, int sizeZ, float oDistance,
     this->oDistance = oDistance;
     this->oWeight = oWeight;
     this->damping = damping;
+    this->floorTexture = floorTexture;
 
     //temporary vector for indies:
     vector <GLuint> idxVector;  // we first put the indices into this vector
     // then copy them to the array below
 
+    if (oscillators != nullptr) delete [] oscillators;
     oscillators = new Oscillator[oscillatorsNum];
     idxVector.clear();  //to be sure it is empty
     for (int xc = 0; xc < sizeX; xc++) {
@@ -53,6 +56,7 @@ void Pool::initialize(int sizeX, int sizeZ, float oDistance,
     }
 
     //copy the indices:
+    if (indices != nullptr) delete [] indices;
     indices = new GLuint[idxVector.size()];  //allocate the required memory
     for (size_t i = 0; i < idxVector.size(); i++) {
         indices[i] = idxVector[i];
@@ -208,6 +212,7 @@ void Pool::update(float deltaTime) {
 
 
 void Pool::render() {
+    floorTexture->bind();
     // There might be more vertex arrays.
     // Thus, pass the pointers each time you use them:
     glVertexPointer(3,   //3 components per vertex (x,y,z)
