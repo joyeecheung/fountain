@@ -82,7 +82,7 @@
     <ClCompile Include="src\Ground.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Pool.cpp" />
-    <ClCompile Include="src\Skybox.cpp" />
+    <ClCompile Include="src\SkyBox.cpp" />
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
