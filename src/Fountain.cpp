@@ -62,7 +62,7 @@ void Fountain::initialize(int levels, int raysPerStep, int dropsPerRay, float dr
     FVector3 initialSpeed;  // initial speed for each drop
     float angleZ; // angle in the front view
     float angleY;  // angle in the top view
-    float minSpeed = 0.2, alpha = 0.05, mag = 3.0f;
+    float minSpeed = 0.2f, alpha = 0.05f, mag = 3.0f;
 
     for (int level = 0; level < levels; level++) {
         for (int ray = 0; ray < raysPerStep; ray++) {
@@ -70,7 +70,7 @@ void Fountain::initialize(int levels, int raysPerStep, int dropsPerRay, float dr
                 randAcc = acceleration + randf(0.005f);
                 if (levels > 1) {
                     int newAngle = (angleMax - angleMin)
-                                   * float(level) / (levels - 1);
+                                   * (float)(level) / (levels - 1);
                     angleZ = angleMin + newAngle + randf(randomAngle);
                 } else {
                     angleZ = angleMin + randf(randomAngle);
