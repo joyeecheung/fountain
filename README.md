@@ -44,7 +44,7 @@ Under HiDPI, it looks like this:
 * <kbd>w</kbd>, <kbd>s</kbd>: Move camera up / down
 * <kbd>a</kbd>, <kbd>d</kbd>: Move camera left / right
 * <kbd>F</kbd>: toggle fullscreen mode
-* <kbd>ESC</kbd>:exit
+* <kbd>ESC</kbd>: exit
 
 ## File structure
 
@@ -74,7 +74,9 @@ Under HiDPI, it looks like this:
 
 ## About the executable
 
-The executable is built with MinGW, the necessary libraries are all bundled inside this project. Just run `Fountain.exe` to see it at work.
+The executable is built for Windows with MinGW, the necessary libraries are all bundled inside this project. Just run `Fountain.exe` to see it at work.
+
+If you want to run it under Linux, you need to build it from source.
 
 ## How to build it?
 
@@ -100,12 +102,17 @@ For example, to generate the project files for VS2012, simply run `premake5 vs20
 
 ### Linux with Make and `g++`
 
-Download premake5 from [here](https://premake.github.io/download.html#v5), extract the executable in the archive(e.g. `premake5`), and put the path to the executable in your `PATH` environment variables(e.g. extract the file to `/usr/local/bin` with root permission). Then open cmd and run `premake5 --help` to see what project files you can generate. I've written the premake script `premake5.lua` to generate the proper project files.
+You need to install freeglut and FreeImage first. For example, if you are using Ubuntu, run
 
-For example, to generate the project files for make, simply run `premake5 gmake`, then run `make`.  The executable will appear under the project directory, named `Fountain`.
+```bash
+$ sudo apt-get install build-essential freeglut3 freeglut3-dev binutils-gold
+$ sudo apt-get install libfreeimage3 libfreeimage-dev
+```
+
+Download premake5 from [here](https://premake.github.io/download.html#v5), extract the executable in the archive(e.g. `premake5`), and put the path to the executable in your `PATH` environment variables(e.g. extract the file to `/usr/local/bin` with root permission so you don't have to touch `PATH`). To generate the project files for make, simply run `premake5 gmake`, then run `make` to build it. The executable will appear under the project directory, named `Fountain`.
 
 ## About
 
 * Author: Joyee Cheung
 * [Email](mailto://joyeec9h3@gmail.com)
-* [GitHub Repo](https://github.com/joyeecheung/SE-342-Computer-Graphics/tree/master/hw4)
+* [GitHub Repo](https://github.com/joyeecheung/fountain)

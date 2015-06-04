@@ -21,7 +21,7 @@ solution "Fountain"
 
       configuration { "not windows", "not macosx" }
         includedirs { "src" }
-        links { "X11", "GL", "GLU", "GLUT", "FreeImage" }
+        links { "X11", "GL", "GLU", "glut", "freeimage" }
 
       configuration "Debug"
          defines { "DEBUG" } -- -DDEBUG
