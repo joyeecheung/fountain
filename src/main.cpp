@@ -376,7 +376,7 @@ int main(int argc, char **argv) {
     // seed
     srand((unsigned)time(NULL));
 
-    printf("1 - 7:\tChange the shape of the fountain\n");
+    printf("1 - 8:\tChange the shape of the fountain\n");
     printf("up, down:\tMove camera forward / backword\n");
     printf("left, right:\tTurn camera right / left\n");
     printf("r, v:\tTurn camera up / down\n");

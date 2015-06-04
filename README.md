@@ -9,6 +9,7 @@ Zhang Qiuyi, 12330402
 * OpenGL and GLU
 
 ## What is it?
+
 A fountain built with OpenGL fixed piepline.
 
 Note: this can look quite different on different machines:
@@ -18,22 +19,33 @@ Note: this can look quite different on different machines:
 
 Under normal resolution, it looks like this:
 
-![](normal-preview.jpg)
+![Normal screenshot](screeshot/normal-preview.jpg)
 
 Under HiDPI, it looks like this:
 
-![](hidpi-preview.jpg)
+![HiDPI scrennshot](screeshot/hidpi-preview.jpg)
 
 ## Techniques Used
 
 1. First person camera
 2. Texture
 3. Lighting
-4. Sky Box
+4. Sky box
 5. Simulated water(particles)
 6. Simulated waves(Oscillators)
 7. Display list
 8. Fonts and text
+
+### Explanation about the water and the waves
+
+* The waters are just semi-transparent particles(points) moving along calculated parabolas.
+* The waves are simulated by oscillators. They change the vertices of the pool and update the normals accordingly to create ripples. The position of these oscillatiors are affected by their neighbors, and the oscillators on the edge will always have a constant `y`. Therefore the waves will bounce back when they reach the edge.
+
+Look closer and take a screenshot, then you will know what is going on.
+
+![](screeshot/closer.jpg)
+
+![](screeshot/closer2.jpg)
 
 ## Operations
 
@@ -52,7 +64,7 @@ Under HiDPI, it looks like this:
   - doc  // report goes here
   - include  // header files
   - lib  // static libraries
-  - obj  // intermidiate obj files
+  - resource  // e.g. textures
   - src  // source code
 
   // dynamic library for the prebuilt executable
