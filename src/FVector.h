@@ -4,7 +4,7 @@
 #include <GL\glut.h>
 
 #define PI 3.1415926535897932384626433832795f
-#define PIdiv180 PI/180.0f
+#define DEGREE PI / 180.0f
 
 class FVector3 { //Float 3d-vect, normally used
 public:

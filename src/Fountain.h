@@ -35,22 +35,22 @@ public:
     void setSpeed(FVector3 newSpeed);
     void setAcceleration(float newAcc);
     void setTime(float newTime);
-    void updatePosition(FVector3 & positionVertex, float dtime,
-                        Pool * pool, Fountain * fountain);
+    void updatePosition(FVector3 & position, float dtime,
+                        Pool & pool, Fountain & fountain);
 private:
-    float time;  //How many steps the drop was "outside", when it falls into the water, time is set back to 0
-    FVector3 speed;  //See the fountain doc for explanation of the physics
-    float acc;
+    float time;  // time after the drop take off
+    FVector3 speed;
+    float acceleration;
 };
 
 class Fountain {
 public:
-    Fountain() : vertices(nullptr), drops(nullptr) {}
+    Fountain() : dropPositions(nullptr), drops(nullptr) {}
 
     Fountain(int levels, int raysPerStep, int dropsPerRay,
              float dropSize, float angleMin, float angleMax,
              float randomAngle, float acceleration)
-             : vertices(nullptr), drops(nullptr) {
+             : dropPositions(nullptr), drops(nullptr) {
         initialize(levels, raysPerStep, dropsPerRay, dropSize, angleMin, angleMax,
                    randomAngle, acceleration);
     }
@@ -66,18 +66,18 @@ public:
     }
     
     void render();
-    void update(float dtime, Pool * pPool);
+    void update(float dtime, Pool & pPool);
     ~Fountain() {
         delete [] drops;
-        delete [] vertices;
+        delete [] dropPositions;
     }
 
-    int numDrops;
-    FVector3 center;
+    FVector3 center;  // center of this fountain
 private:
-    float dropSize;
-    FVector3 * vertices;
-    Drop * drops;
+    int numDrops;  // number of drops
+    float dropSize;  // size of drops
+    FVector3 * dropPositions;  // positions of the drops this fountain emits
+    Drop * drops;  // drop info(speed, accelerations, etc.)
 };
 
 #endif

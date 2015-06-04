@@ -232,7 +232,7 @@ void reshape(int x, int y) {
 
 void idle(void) {
     // update the fountain and the pool
-    fountain.update(TIME_DELTA, &pool);
+    fountain.update(TIME_DELTA, pool);
     pool.update(TIME_DELTA);
 
     //render the scene:

@@ -55,12 +55,12 @@ void Camera::render(void) const {
 
 void Camera::updateDirection(void) {
     // rotate around Y-axis
-    FVector3 step1(cos((rotation.y + 90.0) * PIdiv180),
+    FVector3 step1(cos((rotation.y + 90.0) * DEGREE),
                    0.0f,
-                   -sin((rotation.y + 90.0) * PIdiv180));
+                   -sin((rotation.y + 90.0) * DEGREE));
     // rotate around X-axis:
-    float cosX = cos(rotation.x * PIdiv180);
-    FVector3 step2(step1.x * cosX, sin(rotation.x * PIdiv180), step1.z * cosX);
+    float cosX = cos(rotation.x * DEGREE);
+    FVector3 step2(step1.x * cosX, sin(rotation.x * DEGREE), step1.z * cosX);
     // TODO: rotate around Z-axis
     direction = step2;
     directionChanged = false;

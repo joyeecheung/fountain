@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <gl\glut.h>
+#include <gl/glut.h>
 #include "FVector.h"
 
 /*****
