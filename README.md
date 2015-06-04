@@ -19,11 +19,11 @@ Note: this can look quite different on different machines:
 
 Under normal resolution, it looks like this:
 
-![Normal screenshot](screeshot/normal-preview.jpg)
+![Normal screenshot](screenshot/normal-preview.jpg)
 
 Under HiDPI, it looks like this:
 
-![HiDPI scrennshot](screeshot/hidpi-preview.jpg)
+![HiDPI scrennshot](screenshot/hidpi-preview.jpg)
 
 ## Techniques Used
 
@@ -43,9 +43,9 @@ Under HiDPI, it looks like this:
 
 Look closer and take a screenshot, then you will know what is going on.
 
-![](screeshot/closer.jpg)
+![](screenshot/closer.jpg)
 
-![](screeshot/closer2.jpg)
+![](screenshot/closer2.jpg)
 
 ## Operations
 
