@@ -22,19 +22,19 @@ public:
 
     Pool(int sizeX, int sizeZ, float height,
          float odistance, float oweight, float damping, float splash,
-         float textureStretchX, float textureStretchZ,
+         float texRepeatX, float texRepeatZ,
          Texture *floorTexture)
          : oscillators(nullptr), indices(nullptr) {
         initialize(sizeX, sizeZ, height,
                    odistance, oweight, damping, splash,
-                   textureStretchX, textureStretchZ,
+                   texRepeatX, texRepeatZ,
                    floorTexture);
     }
 
     void initialize(int sizeX, int sizeZ, float height,
                     float odistance, float oweight,
                     float damping, float splash,
-                    float textureStretchX, float textureStretchZ,
+                    float texRepeatX, float texRepeatZ,
                     Texture *floorTexture);
 
     float getODistance() const {

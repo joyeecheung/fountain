@@ -5,8 +5,9 @@
 void Pool::initialize(int sizeX, int sizeZ, float height,
                       float oDistance, float oWeight,
                       float damping, float splash,
-                      float texSizeX, float texSizeZ,
+                      float texRepeatX, float texRepeatZ,
                       Texture * floorTexture) {
+    // initializes the members
     this->sizeX = sizeX;
     this->sizeZ = sizeZ;
     this->height = height;
@@ -25,20 +26,24 @@ void Pool::initialize(int sizeX, int sizeZ, float height,
     for (int i = 0; i < sizeX; i++) {
         for (int j = 0; j < sizeZ; j++) {
             int idx = i + j * sizeX;
+            // positions
             oscillators[idx].x = oDistance * float(i);
-            oscillators[idx].y = 0.0f;
+            oscillators[idx].y = 0.0f;  // on the plane initially
             oscillators[idx].z = oDistance * float(j);
 
+            // normals. pointing up initially
             oscillators[idx].nx = 0.0f;
             oscillators[idx].ny = 1.0f;
             oscillators[idx].nz = 0.0f;
 
-            oscillators[idx].texX = (float)i / (float)sizeX * texSizeX;
-            oscillators[idx].texY = 1.0f - (float)j / (float)sizeZ * texSizeZ;
+            // texture coordinates
+            oscillators[idx].texX = (float)i / (float)sizeX * texRepeatX;
+            oscillators[idx].texY = 1.0f - (float)j / (float)sizeZ * texRepeatZ;
 
+            // initial speed
             oscillators[idx].speedY = 0;
 
-            // create two triangles
+            // create a peek for it. that's two triangles
             if ((i < sizeX - 1) && (j < sizeZ - 1)) {
                 idxVector.push_back(i + j * sizeX);
                 idxVector.push_back((i + 1) + j * sizeX);
@@ -63,117 +68,110 @@ void Pool::initialize(int sizeX, int sizeZ, float height,
 }
 
 void Pool::reset() {
-    for (int xc = 0; xc < sizeX; xc++) {
-        for (int zc = 0; zc < sizeZ; zc++) {
-            int idx = xc + zc * sizeX;
-            oscillators[idx].y = 0.0f;
-            oscillators[idx].speedY = 0.0f;
+    for (int i = 0; i < sizeX; i++) {
+        for (int j = 0; j < sizeZ; j++) {
+            int idx = i + j * sizeX;
+            // normal points up
             oscillators[idx].nx = 0.0f;
             oscillators[idx].ny = 1.0f;
             oscillators[idx].nz = 0.0f;
+            // back to the plane
+            oscillators[idx].y = 0.0f;
+            // initial speed
+            oscillators[idx].speedY = 0.0f;
         }
     }
 }
 
 void Pool::updateOscillator(int posX, int posZ) {
+    // if in the range.
+    // this is needed by fountains with drops out of range
     if ((posX >= 0) && (posX < sizeX) && (posZ >= 0) && (posZ < sizeZ)) {
-        // THIS LINE IS REQUIRED FOR FOUNTAINS WITH MANY DROPS!!!
         int idx = posX + posZ * sizeX;
-        if (oscillators[idx].y > -0.15)
+        if (oscillators[idx].y > -0.15)  // TODO: move out this hard threshold
             oscillators[idx].y += splash;
     }
 }
 
-
 void Pool::update(float deltaTime) {
-    //********
-    // Here we do the physical calculations: 
-    // The m_Oscillators are moved according to their neighbors.
-    // The parameter bEndIsFree indicates, whether the m_Oscillators in the edges can move or not.
-    // The new position may be assigned not before all calculations are done!
-
-    // PLEASE NOTE: THESE ARE APPROXIMATIONS AND I KNOW THIS! (but is looks good, doesn't it?)
-
-    // if we use two loops, it is a bit easier to understand what I do here.
-
-    int xc, zc;
-    for (xc = 0; xc < sizeX; xc++) {
-        for (zc = 0; zc < sizeZ; zc++) {
-            int idx = xc + zc * sizeX;
-
+    /********
+     * The movements of the oscillators are affected by their neighbors
+     * The calculation must be done before update the positions.
+     *********/
+    for (int i = 0; i < sizeX; i++) {
+        for (int j = 0; j < sizeZ; j++) {
+            int idx = i + j * sizeX;
+            // store the y temperorily
             oscillators[idx].newY = oscillators[idx].y;
 
-            //check, if this oscillator is on an edge (=>end)
-            if ((xc == 0) || (xc == sizeX - 1) || (zc == 0) || (zc == sizeZ - 1))
-                ;//TBD: calculating m_Oscillators at the edge (if the end is free)
-            else {
-                //calculate the new speed:
+            // TODO: calculatE oscillators at the edge (if it doesn't bounce)
+            if ((i == 0) || (i == sizeX - 1) || (j == 0) || (j == sizeZ - 1)) {
+                ;
+            } else { // calculate the new speed
+                // update the speed (i.e.accelerate) according to the 4 neighbors
+                float avgdiff = oscillators[idx - 1].y   //left
+                                    + oscillators[idx + 1].y // right
+                                    + oscillators[idx - sizeX].y //upper
+                                    + oscillators[idx + sizeX].y  // lower
+                                    - 4 * oscillators[idx].y;  // subtract itself all at one
 
-                //Change the speed (=accelerate) according to the oscillator's 4 direct neighbors:
-                float avgDifference = oscillators[idx - 1].y //left neighbor
-                    + oscillators[idx + 1].y 		//right neighbor
-                    + oscillators[idx - sizeX].y  //upper neighbor
-                    + oscillators[idx + sizeX].y  //lower neighbor
-                    - 4 * oscillators[idx].y;	  //subtract the pos of the current osc. 4 times	
-
-                oscillators[idx].speedY += avgDifference*(deltaTime / oWeight);
-
+                oscillators[idx].speedY += avgdiff * (deltaTime / oWeight);
                 oscillators[idx].speedY *= (1.0f - damping);
 
-                //calculate the new position, but do not yet store it in "y"
-                // (this would affect the calculation of the other osc.s)
+                // store the new position.
+                // NOTE: can't just update it because the neighbors needs the old y
                 oscillators[idx].newY += oscillators[idx].speedY * deltaTime;
             }
         }
     }
 
-    // copy the new position to y:
-    for (xc = 0; xc < sizeX; xc++) {
-        for (int zc = 0; zc < sizeZ; zc++) {
-            int idx = xc + zc * sizeX;
+    // calculation has been done.
+    // update the y's
+    for (int i = 0; i < sizeX; i++) {
+        for (int j = 0; j < sizeZ; j++) {
+            int idx = i + j * sizeX;
             oscillators[idx].y = oscillators[idx].newY;
         }
     }
 
-    // calculate new normal vectors (according to the oscillator's neighbors):
-    for (xc = 0; xc < sizeX; xc++) {
-        for (int zc = 0; zc < sizeZ; zc++) {
-            // Calculating the normal:
-            // Take the direction vectors 1.) from the left to the right neighbor 
-            // and 2.) from the upper to the lower neighbor.
-            // The vector orthogonal to these 
+    // update normals using the neighbors
+    for (int i = 0; i < sizeX; i++) {
+        for (int j = 0; j < sizeZ; j++) {
+            // the new normal is orthogonal to
+            // 1. the vector from the left to the right neighbor
+            // 2. the vector from the upper to the lower neighbor
+            int idx = i + j * sizeX,
+                ileft = i - 1 + j * sizeX, iright = i + 1 + j * sizeX,
+                iup = i + (j + 1) * sizeX, idown = i + (j - 1) * sizeX;
+            FVector3 p1, p2; // store the points for calculating u and v
+                             // needed because of the boundaries.
+            FVector3 u, v;  // direction vectors
+            int ip1 = idx, ip2 = idx;  // indices for p1 and p2
 
-            FVector3 u, v, p1, p2;	//u and v are direction vectors. p1 / p2: temporary used (storing the points)
-            int idx = xc + zc * sizeX,
-                ileft = xc - 1 + zc * sizeX, iright = xc + 1 + zc * sizeX,
-                iup = xc + (zc + 1) * sizeX, idown = xc + (zc - 1) * sizeX;
-
-            int ip1 = idx, ip2 = idx;
-
-            ip1 = xc > 0 ? ileft : idx;
-            ip2 = xc < sizeX - 1 ? iright : idx;
+            // calculate left-to-right direction vector
+            ip1 = i > 0 ? ileft : idx;
+            ip2 = i < sizeX - 1 ? iright : idx;
             p1 = FVector3(oscillators[ip1].x,
                           oscillators[ip1].y,
                           oscillators[ip1].z);
             p2 = FVector3(oscillators[ip2].x,
                           oscillators[ip2].y,
                           oscillators[ip2].z);
+            u = p2 - p1;
 
-            u = p2 - p1; //vector from the left neighbor to the right neighbor
-
-            ip1 = zc > 0 ? idown : idx;
-            ip2 = zc < sizeZ - 1 ? iup : idx;
-
+            // calculate upper-to-lower direction vector
+            ip1 = j > 0 ? idown : idx;
+            ip2 = j < sizeZ - 1 ? iup : idx;
             p1 = FVector3(oscillators[ip1].x,
                           oscillators[ip1].y,
                           oscillators[ip1].z);
             p2 = FVector3(oscillators[ip2].x,
                           oscillators[ip2].y,
                           oscillators[ip2].z);
+            v = p2 - p1;
 
-            v = p2 - p1; //vector from the upper neighbor to the lower neighbor
+            // cross product to get the orthogonal vector
             FVector3 normal = u.cross(v).normalize();
-
             // the normal should always points up
             float sign = normal.y > 0.0 ? 1.0f : -1.0f;
             oscillators[idx].nx = normal.x * sign;
