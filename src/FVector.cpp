@@ -1,8 +1,8 @@
 #include <cmath>
 #include "FVector.h"
 
-GLfloat FVector3::length() const {
-    return (GLfloat)(sqrt(x * x + y * y + z * z));
+float FVector3::length() const {
+    return (float)(sqrt(x * x + y * y + z * z));
 }
 
 FVector3 FVector3::normalize() const {
@@ -27,7 +27,7 @@ FVector3 FVector3::operator- (const FVector3 &v) const {
     return FVector3(x - v.x, y - v.y, z - v.z);
 }
 
-GLfloat FVector3::operator* (const FVector3 &v) const {
+float FVector3::operator* (const FVector3 &v) const {
     return x * v.x + y * v.y + z * v.z;
 }
 

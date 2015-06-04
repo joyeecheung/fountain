@@ -1,7 +1,7 @@
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
-#include <gl/glut.h>
+#include <GL/glut.h>
 #include "Texture.h"
 
 #define SKY_FRONT 0
@@ -18,16 +18,13 @@ public:
                     float minY, float maxY,
                     float minZ, float maxZ,
                     Texture * textures);
-    void render();
+    void render() const;
 private:
-    float minX;
-    float maxX;
-    float minY;
-    float maxY;
-    float minZ;
-    float maxZ;
-    Texture *textures;
-    GLuint listIdx;
+    float minX, maxX;  // dimension on x-axis
+    float minY, maxY;  // dimension on y-axis
+    float minZ, maxZ;  // dimension on z-axis
+    Texture *textures;  // skybox textures
+    int listIdx;  // index to the display list
 };
 
 #endif

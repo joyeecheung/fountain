@@ -1,17 +1,18 @@
-#include <GL\glut.h>
+#include <GL/glut.h>
 
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
 #include <cstdio>
 
-#include "Pool.h"
-#include "Fountain.h"
-#include "Basin.h"
-#include "Camera.h"
+#include "FVector.h"
 #include "Texture.h"
+#include "Camera.h"
+#include "Basin.h"
 #include "SkyBox.h"
 #include "Ground.h"
+#include "Pool.h"
+#include "Fountain.h"
 
 /***********************
  * Sky and ground Configuration
@@ -22,14 +23,13 @@ const float GROUND_SIZE = 30.0f;
 /***********************
  * Pool Configuration
  ***********************/
-const int NUM_X_OSCILLATORS = 180;
-const int NUM_Z_OSCILLATORS = 180;
+const int OSCILLATORS_NUM_X = 180;
+const int OSCILLATORS_NUM_Z = 180;
 const float OSCILLATOR_DISTANCE = 0.023f;
 const float OSCILLATOR_WEIGHT = 0.00005f;
-const float POOL_SIZE_X = (NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE);
-const float POOL_SIZE_Z = (NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE);
+const float OSCILLATOR_SPLASH = -0.03f;
+const float OSCILLATOR_DAMPING = 0.015f;
 const float POOL_HEIGHT = 0.2f;
-const float DAMPING = 0.015f;
 const float POOL_TEX_REPEAT_X = 2.0f;
 const float POOL_TEX_REPEAT_Z = 2.0f;
 
@@ -38,6 +38,8 @@ const float POOL_TEX_REPEAT_Z = 2.0f;
  ***********************/
 const float BASIN_BORDER_WIDTH = 0.4f;
 const float BASIN_BORDER_HEIGHT = 0.2f;
+const float BASIN_INNER_X = (OSCILLATORS_NUM_X * OSCILLATOR_DISTANCE);
+const float BASIN_INNER_Z = (OSCILLATORS_NUM_Z * OSCILLATOR_DISTANCE);
 
 /***********************
  * Fountain Configuration
@@ -55,19 +57,18 @@ FountainInitializer initializers[] = {
 };
 
 const float WATER_COLOR[] = { 0.9f, 0.9f, 0.9f, 0.6f };
-const float SPLASH = -0.03f;
 const float TIME_DELTA = 0.002f;
 
 /***********************
  * Lighting configuration
  ***********************/
-GLfloat lightAmbient1[] = { 0.1f, 0.1f, 0.1f, 0.0f };
-GLfloat lightDiffuse1[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f };
-GLfloat lightPosition1[] = { 0.8f, 0.4f, -0.5f, 0.0f };
+const float LIGHT_AMBIENT_1[] = { 0.1f, 0.1f, 0.1f, 0.0f };
+const float LIGHT_DIFFUSE_1[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f };
+const float LIGHT_POSITION_1[] = { 0.8f, 0.4f, -0.5f, 0.0f };
 
-GLfloat lightAmbient2[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-GLfloat lightDiffuse2[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f};
-GLfloat lightPosition2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
+const float LIGHT_AMBIENT_2[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+const float LIGHT_DIFFUSE_2[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f };
+const float LIGHT_POSITION_2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
 
 
 /***********************
@@ -75,7 +76,7 @@ GLfloat lightPosition2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
  ***********************/
 const float MOVE_FACTOR = 0.1f;
 const float ROTATE_FACTOR = 1.0f;
-const FVector3 CAMERA_POSITION(POOL_SIZE_X / 2.0f, 1.8f, POOL_SIZE_Z + 3.5f);
+const FVector3 CAMERA_POSITION(BASIN_INNER_X / 2.0f, 1.8f, BASIN_INNER_Z + 3.5f);
 const FVector3 CAMERA_ROTATION(-5.0f, 0.0f);
 
 /***********************
@@ -211,7 +212,7 @@ void display(void) {
 
     camera.render();
 
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition2);
+    glLightfv(GL_LIGHT0, GL_POSITION, LIGHT_POSITION_2);
     //Turn two sided lighting on:
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
@@ -268,22 +269,23 @@ int main(int argc, char **argv) {
                       -SKY_BOX_SIZE, SKY_BOX_SIZE,
                       -SKY_BOX_SIZE, SKY_BOX_SIZE, skyTextures);
 
-    pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS, POOL_HEIGHT,
+    pool.initialize(OSCILLATORS_NUM_X, OSCILLATORS_NUM_Z, POOL_HEIGHT,
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
-                    DAMPING, SPLASH, POOL_TEX_REPEAT_X, POOL_TEX_REPEAT_Z,
+                    OSCILLATOR_DAMPING, OSCILLATOR_SPLASH,
+                    POOL_TEX_REPEAT_X, POOL_TEX_REPEAT_Z,
                     &pebbleTexture);
 
     fountain.initialize(initializers[0]);
 
     basin.initialize(BASIN_BORDER_HEIGHT + POOL_HEIGHT, BASIN_BORDER_WIDTH,
-                     POOL_SIZE_X, POOL_SIZE_Z, &basinTexture);
+                     BASIN_INNER_X, BASIN_INNER_Z, &basinTexture);
 
     ground.initialize(-GROUND_SIZE, GROUND_SIZE,
                       -GROUND_SIZE, GROUND_SIZE, &groundTexture);
 
     // place the fountain in the center of the pool
-    fountain.center = FVector3(POOL_SIZE_X / 2.0f, POOL_HEIGHT,
-                               POOL_SIZE_Z / 2.0f);
+    fountain.center = FVector3(BASIN_INNER_X / 2.0f, POOL_HEIGHT,
+                               BASIN_INNER_Z / 2.0f);
 
     // initialize camera: 
     camera.move(CAMERA_POSITION);
@@ -298,14 +300,15 @@ int main(int argc, char **argv) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
 
-    glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
-    glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
-    glEnable(GL_LIGHT1);
     // lighting
-    glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
-    glLightfv(GL_LIGHT2, GL_POSITION, lightPosition2);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, LIGHT_AMBIENT_1);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, LIGHT_DIFFUSE_1);
+    glLightfv(GL_LIGHT1, GL_POSITION, LIGHT_POSITION_1);
+    glEnable(GL_LIGHT1);
+   
+    glLightfv(GL_LIGHT2, GL_AMBIENT, LIGHT_AMBIENT_2);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, LIGHT_DIFFUSE_2);
+    glLightfv(GL_LIGHT2, GL_POSITION, LIGHT_POSITION_2);
     glEnable(GL_LIGHT2);
 
     glEnable(GL_LIGHTING);

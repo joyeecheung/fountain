@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <gl/glut.h>
+#include <GL/glut.h>
 #include "FVector.h"
 
 /*****
@@ -17,13 +17,13 @@ public:
        Should be called after calling glLoadIdentity. */
     void render(void) const;
     void move(const FVector3 & direction);
-    void moveX(GLfloat distance);
-    void moveY(GLfloat distance);
-    void moveZ(GLfloat distance);
+    void moveX(float distance);
+    void moveY(float distance);
+    void moveZ(float distance);
     void rotate(const FVector3 & angles);
-    void rotateX(GLfloat angle);
-    void rotateY(GLfloat angle);
-    void rotateZ(GLfloat angle);
+    void rotateX(float angle);
+    void rotateY(float angle);
+    void rotateZ(float angle);
 private:
     FVector3 position;
     /* needs to mark the update by setting directionChanged to true

@@ -4,6 +4,7 @@ void Skybox::initialize(float minX, float maxX,
                         float minY, float maxY,
                         float minZ, float maxZ,
                         Texture *textures) {
+    // initialize members
     this->minX = minX;
     this->maxX = maxX;
     this->minY = minY;
@@ -11,9 +12,11 @@ void Skybox::initialize(float minX, float maxX,
     this->minZ = minZ;
     this->maxZ = maxZ;
 
+    // set up a new display list
     this->listIdx = glGenLists(1);
     glNewList(listIdx, GL_COMPILE);
 
+    // draw the faces of the box
     textures[SKY_RIGHT].bind();
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(minX, minY, minZ);
@@ -46,7 +49,6 @@ void Skybox::initialize(float minX, float maxX,
     glTexCoord2f(0, 1); glVertex3f(minX, maxY, maxZ);
     glEnd();
 
-    /* Top and Bottom */
     textures[SKY_UP].bind();
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(minX, maxY, minZ);
@@ -66,6 +68,6 @@ void Skybox::initialize(float minX, float maxX,
     glEndList();
 }
 
-void Skybox::render() {
+void Skybox::render() const {
     glCallList(listIdx);
 }

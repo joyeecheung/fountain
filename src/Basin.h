@@ -1,7 +1,7 @@
 #ifndef BASIN_H
 #define BASIN_H
 
-#include <gl\glut.h>
+#include <GL/glut.h>
 #include "Texture.h"
 
 class Basin {
@@ -18,7 +18,7 @@ private:
     float innerSizeZ;
     float texBorder;
     Texture *texture;
-    GLuint listIdx;
+    int listIdx;
 };
 
 #endif

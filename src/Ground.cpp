@@ -1,4 +1,5 @@
 #include "Ground.h"
+
 void Ground::initialize(float minX, float maxX,
                         float minZ, float maxZ,
                         Texture *groundTexture) {

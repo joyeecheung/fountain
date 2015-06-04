@@ -1,19 +1,18 @@
 #ifndef POOL_H
 #define POOL_H
 
-#include <gl\glut.h>
-#include <vector>
+#include <GL/glut.h>
 #include "FVector.h"
 #include "Texture.h"
 
 struct Oscillator {
     // NOTE: the positions of these fields can not be changed!!
     // The rendering of the pool depends on this layout!!
-    GLfloat x, y, z;  // position
-    GLfloat nx, ny, nz;  // normal
-    GLfloat texX, texY;  // texture coordinates
-    GLfloat speedY;
-    GLfloat newY;
+    float x, y, z;  // position
+    float nx, ny, nz;  // normal
+    float texX, texY;  // texture coordinates
+    float speedY;  // speed along the y direction
+    float newY;  // for storing calculated y temperorily
 };
 
 class Pool {
@@ -22,21 +21,21 @@ public:
     // default
     Pool() : oscillators(nullptr), indices(nullptr) {}
     // explicit arguments
-    Pool(int sizeX, int sizeZ, float height,
-         float odistance, float oweight, float damping, float splash,
+    Pool(int oNumX, int oNumZ, float height,
+         float oDistance, float oWeight, float damping, float splash,
          float texRepeatX, float texRepeatZ,
          Texture *floorTexture)
          : oscillators(nullptr), indices(nullptr) {
-        initialize(sizeX, sizeZ, height,
-                   odistance, oweight, damping, splash,
+        initialize(oNumX, oNumZ, height,
+                   oDistance, oWeight, damping, splash,
                    texRepeatX, texRepeatZ,
                    floorTexture);
     }
 
     /*************** initializers *****************/
     // explicit arguments
-    void initialize(int sizeX, int sizeZ, float height,
-                    float odistance, float oweight,
+    void initialize(int oNumX, int oNumZ, float height,
+                    float oDistance, float oWeight,
                     float damping, float splash,
                     float texRepeatX, float texRepeatZ,
                     Texture *floorTexture);
@@ -51,7 +50,7 @@ public:
 
     // update the oscillator at a position
     // this should be caused by a drop
-    void splashOscillator(int posX, int posZ);
+    void splashOscillator(int idxX, int idxZ);
     void update(float deltaTime);    
     void reset();
 
@@ -60,15 +59,17 @@ public:
         delete [] indices;
     }
 private:
-    // vertex data for the waves
-    Oscillator * oscillators;
-    GLuint *indices;
-    Texture *floorTexture;
-    int oscillatorsNum;  // sizeX * sizeZ
-    float oDistance, oWeight, splash, damping;
-    int sizeX, sizeZ;
-    float height;
-    int indicesNum;
+    Oscillator * oscillators;  // oscillators for simulating the waves
+    int *indices;  // indices for drawing
+    Texture *floorTexture;  // texture for the floor of the pool
+    
+    float oDistance; // distance between oscillators
+    float oWeight;  //  weight of oscillators
+    int oNumX, oNumZ;  // number of oscillators in the pool
+    int oNum;  // sizeX * sizeZ
+    float splash, damping;
+    float height;  // height of the pool
+    int indicesNum;  // number of indices, roughly 2 * oscillatorsNum
 };
 
 #endif

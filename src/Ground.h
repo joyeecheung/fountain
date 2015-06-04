@@ -1,7 +1,7 @@
 #ifndef GROUND_H
 #define GROUND_H
 
-#include <gl\glut.h>
+#include <GL/glut.h>
 #include "Texture.h"
 
 class Ground {
@@ -16,7 +16,7 @@ private:
     float minZ;
     float maxZ;
     Texture *groundTexture;
-    GLuint listIdx;
+    int listIdx;
 };
 
 #endif

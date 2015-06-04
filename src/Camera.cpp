@@ -1,6 +1,4 @@
 #include <cmath>
-
-#include "windows.h"
 #include "Camera.h"
 
 void Camera::move(const FVector3 &dir) {
