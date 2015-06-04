@@ -7,6 +7,8 @@
 #include "Texture.h"
 
 struct Oscillator {
+    // NOTE: the positions of these fields can not be changed!!
+    // The rendering of the pool depends on this layout!!
     GLfloat x, y, z;  // position
     GLfloat nx, ny, nz;  // normal
     GLfloat texX, texY;  // texture coordinates
@@ -17,6 +19,7 @@ struct Oscillator {
 class Pool {
 public:
     Pool() : oscillators(nullptr), indices(nullptr) {}
+
     Pool(int sizeX, int sizeZ, float height,
          float odistance, float oweight, float damping, float splash,
          float textureStretchX, float textureStretchZ,
@@ -27,17 +30,23 @@ public:
                    textureStretchX, textureStretchZ,
                    floorTexture);
     }
+
     void initialize(int sizeX, int sizeZ, float height,
                     float odistance, float oweight,
                     float damping, float splash,
                     float textureStretchX, float textureStretchZ,
                     Texture *floorTexture);
-    /* Oscillator distance */
-    float getODistance();
+
+    float getODistance() const {
+        return oDistance;
+    }
+
+    void render() const;
+
     void updateOscillator(int posX, int posZ);
-    void update(float deltaTime);
-    void render();
+    void update(float deltaTime);    
     void reset();
+
     ~Pool() {
         delete [] oscillators;
         delete [] indices;

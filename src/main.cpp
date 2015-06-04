@@ -61,12 +61,12 @@ const float TIME_DELTA = 0.002f;
 /***********************
  * Lighting configuration
  ***********************/
-GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+GLfloat lightAmbient1[] = { 0.1f, 0.1f, 0.1f, 0.0f };
 GLfloat lightDiffuse1[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f };
 GLfloat lightPosition1[] = { 0.8f, 0.4f, -0.5f, 0.0f };
 
-GLfloat lightAmbient2[] = { 0.1f, 0.1f, 0.1f, 0.0f };
-GLfloat lightDiffuse2[] = { 0.3f, 0.3f, 0.3f, 0.0f };
+GLfloat lightAmbient2[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+GLfloat lightDiffuse2[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f};
 GLfloat lightPosition2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
 
 

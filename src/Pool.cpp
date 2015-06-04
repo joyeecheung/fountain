@@ -1,14 +1,12 @@
-#include <Vector>  //dynamic array "vector"
-
+#include <Vector>
 #include "Pool.h"
-#include "FVector.h"  //3d-vectors, my own routines...
+#include "FVector.h" 
 
 void Pool::initialize(int sizeX, int sizeZ, float height,
                       float oDistance, float oWeight,
                       float damping, float splash,
                       float texSizeX, float texSizeZ,
                       Texture * floorTexture) {
-    //assign member variables
     this->sizeX = sizeX;
     this->sizeZ = sizeZ;
     this->height = height;
@@ -19,52 +17,49 @@ void Pool::initialize(int sizeX, int sizeZ, float height,
     this->splash = splash;
     this->floorTexture = floorTexture;
 
-    //temporary vector for indies:
-    std::vector <GLuint> idxVector;  // we first put the indices into this vector
-    // then copy them to the array below
+    std::vector <GLuint> idxVector; // temporary vector for indices
 
     if (oscillators != nullptr) delete [] oscillators;
     oscillators = new Oscillator[oscillatorsNum];
-    idxVector.clear();  //to be sure it is empty
-    for (int xc = 0; xc < sizeX; xc++) {
-        for (int zc = 0; zc < sizeZ; zc++) {
-            int idx = xc + zc * sizeX;
-            oscillators[idx].x = oDistance * float(xc);
+
+    for (int i = 0; i < sizeX; i++) {
+        for (int j = 0; j < sizeZ; j++) {
+            int idx = i + j * sizeX;
+            oscillators[idx].x = oDistance * float(i);
             oscillators[idx].y = 0.0f;
-            oscillators[idx].z = oDistance * float(zc);
+            oscillators[idx].z = oDistance * float(j);
 
             oscillators[idx].nx = 0.0f;
             oscillators[idx].ny = 1.0f;
             oscillators[idx].nz = 0.0f;
 
-            oscillators[idx].texX = (float)xc / (float)sizeX * texSizeX;
-            oscillators[idx].texY = 1.0f - (float)zc / (float)sizeZ * texSizeZ;
+            oscillators[idx].texX = (float)i / (float)sizeX * texSizeX;
+            oscillators[idx].texY = 1.0f - (float)j / (float)sizeZ * texSizeZ;
 
             oscillators[idx].speedY = 0;
 
             // create two triangles
-            if ((xc < sizeX - 1) && (zc < sizeZ - 1)) {
-                idxVector.push_back(xc + zc*sizeX);
-                idxVector.push_back((xc + 1) + zc*sizeX);
-                idxVector.push_back((xc + 1) + (zc + 1)*sizeX);
+            if ((i < sizeX - 1) && (j < sizeZ - 1)) {
+                idxVector.push_back(i + j * sizeX);
+                idxVector.push_back((i + 1) + j * sizeX);
+                idxVector.push_back((i + 1) + (j + 1) * sizeX);
 
-                idxVector.push_back(xc + zc*sizeX);
-                idxVector.push_back((xc + 1) + (zc + 1)*sizeX);
-                idxVector.push_back(xc + (zc + 1)*sizeX);
+                idxVector.push_back(i + j * sizeX);
+                idxVector.push_back((i + 1) + (j + 1) * sizeX);
+                idxVector.push_back(i + (j + 1) * sizeX);
             }
 
         }
     }
 
-    //copy the indices:
+    // copy the indices
     if (indices != nullptr) delete [] indices;
-    indices = new GLuint[idxVector.size()];  //allocate the required memory
+    indices = new GLuint[idxVector.size()];
     for (size_t i = 0; i < idxVector.size(); i++) {
         indices[i] = idxVector[i];
     }
 
     indicesNum = idxVector.size();
-    idxVector.clear();
 }
 
 void Pool::reset() {
@@ -132,7 +127,7 @@ void Pool::update(float deltaTime) {
         }
     }
 
-    //copy the new position to y:
+    // copy the new position to y:
     for (xc = 0; xc < sizeX; xc++) {
         for (int zc = 0; zc < sizeZ; zc++) {
             int idx = xc + zc * sizeX;
@@ -155,18 +150,8 @@ void Pool::update(float deltaTime) {
 
             int ip1 = idx, ip2 = idx;
 
-            if (xc > 0) {
-                ip1 = ileft;
-            } else {
-                ip1 = idx;
-            }
-
-            if (xc < sizeX - 1) {
-                ip2 = iright;
-            } else {
-                ip2 = idx;
-            }
-            
+            ip1 = xc > 0 ? ileft : idx;
+            ip2 = xc < sizeX - 1 ? iright : idx;
             p1 = FVector3(oscillators[ip1].x,
                           oscillators[ip1].y,
                           oscillators[ip1].z);
@@ -175,74 +160,46 @@ void Pool::update(float deltaTime) {
                           oscillators[ip2].z);
 
             u = p2 - p1; //vector from the left neighbor to the right neighbor
-            if (zc > 0) {
-                ip1 = idown;
-            } else {
-                ip1 = idx;
-            }
 
-            if (zc < sizeZ - 1) {
-                ip2 = iup;
-            } else {
-                ip2 = idx;
-            }
+            ip1 = zc > 0 ? idown : idx;
+            ip2 = zc < sizeZ - 1 ? iup : idx;
+
             p1 = FVector3(oscillators[ip1].x,
                           oscillators[ip1].y,
                           oscillators[ip1].z);
             p2 = FVector3(oscillators[ip2].x,
                           oscillators[ip2].y,
                           oscillators[ip2].z);
+
             v = p2 - p1; //vector from the upper neighbor to the lower neighbor
-            //calculate the normal:
             FVector3 normal = u.cross(v).normalize();
 
-            //assign the normal:
-            if (normal.y > 0.0) {  //normals always look upward!
-                oscillators[idx].nx = normal.x;
-                oscillators[idx].ny = normal.y;
-                oscillators[idx].nz = normal.z;
-            } else {
-                oscillators[idx].nx = -normal.x;
-                oscillators[idx].ny = -normal.y;
-                oscillators[idx].nz = -normal.z;
-            }
+            // the normal should always points up
+            float sign = normal.y > 0.0 ? 1.0f : -1.0f;
+            oscillators[idx].nx = normal.x * sign;
+            oscillators[idx].ny = normal.y * sign;
+            oscillators[idx].nz = normal.z * sign;
         }
     }
 
 }
 
-void Pool::render() {
-    glPushMatrix();
-    glTranslatef(0.0f, height, 0.0f);
-    floorTexture->bind();
-    // There might be more vertex arrays.
-    // Thus, pass the pointers each time you use them:
-    glVertexPointer(3,   //3 components per vertex (x,y,z)
-                    GL_FLOAT,
-                    sizeof(Oscillator),
-                    oscillators);
-    glTexCoordPointer(2,
-                      GL_FLOAT,
-                      sizeof(Oscillator),
-                      &oscillators[0].texX);
-
-    glNormalPointer(GL_FLOAT,
-                    sizeof(Oscillator),
-                    &oscillators[0].nx);  //Pointer to the first normal
+void Pool::render() const {
+    // set up pointers
+    glVertexPointer(3, GL_FLOAT, sizeof(Oscillator), oscillators);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Oscillator), &oscillators[0].texX);
+    glNormalPointer(GL_FLOAT, sizeof(Oscillator), &oscillators[0].nx);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    //Draw the array:
-    glColor3f(1.0, 1.0, 1.0);
-    glDrawElements(GL_TRIANGLES, //mode
-                   indicesNum,  //count, ie. how many indices
-                   GL_UNSIGNED_INT, //type of the index array
-                   indices);
+    // draw
+    glPushMatrix();
+    glTranslatef(0.0f, height, 0.0f);
+    floorTexture->bind();
+    // fill it. NOTE: this will affect the whole scene!!!
+    glColor4f(1.0, 1.0, 1.0, 1.0);
+    glDrawElements(GL_TRIANGLES, indicesNum,  GL_UNSIGNED_INT, indices);
     glPopMatrix();
-}
-
-float Pool::getODistance() {
-    return oDistance;
 }

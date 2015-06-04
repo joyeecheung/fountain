@@ -62,36 +62,38 @@ void Fountain::initialize(int levels, int raysPerStep, int dropsPerRay, float dr
     FVector3 initialSpeed;  // initial speed for each drop
     float angleZ; // angle in the front view
     float angleY;  // angle in the top view
-    float minSpeed = 0.2, rayFactor = 0.05, mag = 3.0f;
+    float minSpeed = 0.2, alpha = 0.05, mag = 3.0f;
 
-    for (int k = 0; k < levels; k++) {
-        for (int j = 0; j < raysPerStep; j++) {
-            for (int i = 0; i < dropsPerRay; i++) {
+    for (int level = 0; level < levels; level++) {
+        for (int ray = 0; ray < raysPerStep; ray++) {
+            for (int drop = 0; drop < dropsPerRay; drop++) {
                 randAcc = acceleration + randf(0.005f);
                 if (levels > 1) {
-                    int newAngle = angleMin + (angleMax - angleMin) * float(k) / (levels - 1);
+                    int newAngle = angleMin +
+                        (angleMax - angleMin) * float(level) / (levels - 1);
                     angleZ = newAngle + randf(randomAngle);
                 } else {
                     angleZ = angleMin + randf(randomAngle);
                 }
 
                 // speed update by levels
-                initialSpeed.x = cos(angleZ * DEGREE) * (rayFactor * k + minSpeed);
-                initialSpeed.y = sin(angleZ * DEGREE) * (rayFactor * k + minSpeed);
-                initialSpeed.z = cos(angleZ * DEGREE) * (rayFactor * k + minSpeed);
+                float levelFactor = alpha * level + minSpeed;
+                initialSpeed.x = cos(angleZ * DEGREE) * levelFactor;
+                initialSpeed.y = sin(angleZ * DEGREE) * levelFactor;
+                initialSpeed.z = cos(angleZ * DEGREE) * levelFactor;
 
                 // speed update by rays
-                angleY = (float)j / (float)raysPerStep * 360.0f;
+                angleY = (float)ray / (float)raysPerStep * 360.0f;
                 initialSpeed.x = initialSpeed.x * cos(angleY * DEGREE) * mag;
                 initialSpeed.z = initialSpeed.z * sin(angleY * DEGREE) * mag;
                 initialSpeed.y = initialSpeed.y * mag;
 
                 // initialize the drops
                 timeElapsed = initialSpeed.y / randAcc;
-                int idx = i + j * dropsPerRay + k * dropsPerRay * raysPerStep;
+                int idx = drop + ray * dropsPerRay + level * dropsPerRay * raysPerStep;
                 drops[idx].setSpeed(initialSpeed);
                 drops[idx].setAcceleration(randAcc);
-                drops[idx].setTime(timeElapsed * i / dropsPerRay);
+                drops[idx].setTime(timeElapsed * drop / dropsPerRay);
             }
         }
     }
@@ -102,7 +104,7 @@ void Fountain::update(float dtime, Pool & pool) {
         drops[i].updatePosition(dropPositions[i], dtime, pool, *this);
 }
 
-void Fountain::render() {
+void Fountain::render() const {
     glEnableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);

@@ -45,8 +45,10 @@ private:
 
 class Fountain {
 public:
+    /*************** constructors  *************/
+    // default
     Fountain() : dropPositions(nullptr), drops(nullptr) {}
-
+    // explicit arguments
     Fountain(int levels, int raysPerStep, int dropsPerRay,
              float dropSize, float angleMin, float angleMax,
              float randomAngle, float acceleration)
@@ -55,18 +57,24 @@ public:
                    randomAngle, acceleration);
     }
 
+    /*************** initializers *****************/
+    // explicit arguments
     void initialize(int levels, int raysPerStep, int dropsPerRay,
                     float dropSize, float angleMin, float angleMax,
                     float randomAngle, float acceleration);
 
+    // use initializer
     void initialize(FountainInitializer init) {
         initialize(init.levels, init.raysPerStep, init.dropsPerRay,
                    init.dropSize, init.angleMin, init.angleMax,
                    init.randomAngle, init.acceleration);
     }
     
-    void render();
-    void update(float dtime, Pool & pPool);
+    // render the fountain
+    void render() const;
+    // update the pool with moved drops
+    void update(float dtime, Pool & pool);
+
     ~Fountain() {
         delete [] drops;
         delete [] dropPositions;
