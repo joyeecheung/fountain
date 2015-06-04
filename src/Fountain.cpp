@@ -38,7 +38,7 @@ void Drop::updatePosition(FVector3 & position, float dtime,
             float distance = pool.getODistance();
             int oX = (int)((newPosition.x + fountain.center.x) / distance);
             int oZ = (int)((newPosition.z + fountain.center.z) / distance);
-            pool.updateOscillator(oX, oZ);
+            pool.splashOscillator(oX, oZ);
         }
     } else {
         position.set(0.0f, 0.0f, 0.0f);

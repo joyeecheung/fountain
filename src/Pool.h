@@ -18,8 +18,10 @@ struct Oscillator {
 
 class Pool {
 public:
+    /*************** constructors  *************/
+    // default
     Pool() : oscillators(nullptr), indices(nullptr) {}
-
+    // explicit arguments
     Pool(int sizeX, int sizeZ, float height,
          float odistance, float oweight, float damping, float splash,
          float texRepeatX, float texRepeatZ,
@@ -31,19 +33,25 @@ public:
                    floorTexture);
     }
 
+    /*************** initializers *****************/
+    // explicit arguments
     void initialize(int sizeX, int sizeZ, float height,
                     float odistance, float oweight,
                     float damping, float splash,
                     float texRepeatX, float texRepeatZ,
                     Texture *floorTexture);
 
+    // get the distance of the oscillators
     float getODistance() const {
         return oDistance;
     }
 
+    // render the pool
     void render() const;
 
-    void updateOscillator(int posX, int posZ);
+    // update the oscillator at a position
+    // this should be caused by a drop
+    void splashOscillator(int posX, int posZ);
     void update(float deltaTime);    
     void reset();
 

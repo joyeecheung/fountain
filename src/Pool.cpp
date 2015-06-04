@@ -83,7 +83,7 @@ void Pool::reset() {
     }
 }
 
-void Pool::updateOscillator(int posX, int posZ) {
+void Pool::splashOscillator(int posX, int posZ) {
     // if in the range.
     // this is needed by fountains with drops out of range
     if ((posX >= 0) && (posX < sizeX) && (posZ >= 0) && (posZ < sizeZ)) {
@@ -104,9 +104,9 @@ void Pool::update(float deltaTime) {
             // store the y temperorily
             oscillators[idx].newY = oscillators[idx].y;
 
-            // TODO: calculatE oscillators at the edge (if it doesn't bounce)
             if ((i == 0) || (i == sizeX - 1) || (j == 0) || (j == sizeZ - 1)) {
-                ;
+                ; // NOTE: this condition can make the oscillators
+                  // at the boundaries always have y = 0, which causes a bounce effect.
             } else { // calculate the new speed
                 // update the speed (i.e.accelerate) according to the 4 neighbors
                 float avgdiff = oscillators[idx - 1].y   //left
@@ -134,7 +134,7 @@ void Pool::update(float deltaTime) {
         }
     }
 
-    // update normals using the neighbors
+    // update normals using the newly positioned neighbors
     for (int i = 0; i < sizeX; i++) {
         for (int j = 0; j < sizeZ; j++) {
             // the new normal is orthogonal to
