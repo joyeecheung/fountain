@@ -23,13 +23,13 @@ const float GROUND_SIZE = 30.0f;
 /***********************
  * Pool Configuration
  ***********************/
-const int OSCILLATORS_NUM_X = 180;
-const int OSCILLATORS_NUM_Z = 180;
-const float OSCILLATOR_DISTANCE = 0.023f;
-const float OSCILLATOR_WEIGHT = 0.00005f;
+const int OSCILLATORS_NUM_X = 110;
+const int OSCILLATORS_NUM_Z = 110;
+const float OSCILLATOR_DISTANCE = 0.04f;
+const float OSCILLATOR_WEIGHT = 0.00015f;
 const float OSCILLATOR_SPLASH = -0.03f;
-const float OSCILLATOR_DAMPING = 0.015f;
-const float POOL_HEIGHT = 0.2f;
+const float OSCILLATOR_DAMPING = 0.005f;
+const float POOL_HEIGHT = 0.3f;
 const float POOL_TEX_REPEAT_X = 2.0f;
 const float POOL_TEX_REPEAT_Z = 2.0f;
 
@@ -44,20 +44,20 @@ const float BASIN_INNER_Z = (OSCILLATORS_NUM_Z * OSCILLATOR_DISTANCE);
 /***********************
  * Fountain Configuration
  ***********************/
-const float DROP_SIZE = 2.0f;
+const float DROP_SIZE = 4.0f;
 FInitializer initializers[] = {
-    FInitializer(4, 100, 100, DROP_SIZE, 75.0f, 90.0f, 0.2f, 0.10f),  // 1
-    FInitializer(4, 100, 10, DROP_SIZE, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
-    FInitializer(2, 200, 100, DROP_SIZE, 50.0f, 90.0f, 1.5f, 0.13f), // 3
-    FInitializer(3, 5, 200, DROP_SIZE, 75.0f, 90.0f, 0.4f, 0.07f), // 4
-    FInitializer(3, 100, 85, DROP_SIZE, 30.0f, 90.0f, 0.2f, 0.15f), // 5
-    FInitializer(1, 20, 100, DROP_SIZE, 50.0f, 60.0f, 5.0f, 0.13f), // 6
-    FInitializer(6, 20, 90, DROP_SIZE, 90.0f, 90.0f, 1.0f, 0.12f), // 7
-    FInitializer(2, 30, 200, DROP_SIZE, 85.0f, 85.0f, 10.0f, 0.08f)// 8
+    FInitializer(4, 30, 30, DROP_SIZE, 75.0f, 90.0f, 0.2f, 0.10f),  // 1
+    FInitializer(4, 30, 8, DROP_SIZE, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
+    FInitializer(2, 40, 10, DROP_SIZE, 50.0f, 90.0f, 1.5f, 0.13f), // 3
+    FInitializer(3, 5, 100, DROP_SIZE, 75.0f, 90.0f, 0.4f, 0.07f), // 4
+    FInitializer(3, 50, 35, DROP_SIZE, 30.0f, 90.0f, 0.2f, 0.15f), // 5
+    FInitializer(1, 20, 60, DROP_SIZE, 50.0f, 60.0f, 5.0f, 0.13f), // 6
+    FInitializer(6, 20, 30, DROP_SIZE, 90.0f, 90.0f, 1.0f, 0.12f), // 7
+    FInitializer(2, 10, 60, DROP_SIZE, 73.0f, 85.0f, 6.0f, 0.08f)// 8
 };
 
-const float WATER_COLOR[] = { 0.9f, 0.9f, 0.9f, 0.6f };
-const float TIME_DELTA = 0.002f;
+const float WATER_COLOR[] = { 0.9f, 0.9f, 0.9f, 0.4f };
+const float TIME_DELTA = 0.001f;
 
 /***********************
  * Lighting configuration
