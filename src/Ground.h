@@ -9,14 +9,12 @@ public:
     Ground() {}
     void initialize(float minX, float maxX,
                     float minZ, float maxZ, Texture *groundTexture);
-    void render();
+    void render() const;
 private:
-    float minX;
-    float maxX;
-    float minZ;
-    float maxZ;
+    float minX, maxX;
+    float minZ, maxZ;
     Texture *groundTexture;
-    int listIdx;
+    int listIdx;  // index to the display list
 };
 
 #endif

@@ -4,9 +4,10 @@
 #include "FVector.h"
 #include "Pool.h"
 
-class FountainInitializer {
+// fountain initializers
+class FInitializer {
 public:
-    FountainInitializer(int levels, int raysPerStep, int dropsPerRay,
+    FInitializer(int levels, int raysPerStep, int dropsPerRay,
                         float dropSize, float angleMin, float angleMax,
                         float randomAngle, float acceleration) {
         this->levels = levels;
@@ -52,8 +53,9 @@ public:
     Fountain(int levels, int raysPerStep, int dropsPerRay,
              float dropSize, float angleMin, float angleMax,
              float randomAngle, float acceleration)
-             : dropPositions(nullptr), drops(nullptr) {
-        initialize(levels, raysPerStep, dropsPerRay, dropSize, angleMin, angleMax,
+        : dropPositions(nullptr), drops(nullptr) {
+        initialize(levels, raysPerStep, dropsPerRay,
+                   dropSize, angleMin, angleMax,
                    randomAngle, acceleration);
     }
 
@@ -64,12 +66,12 @@ public:
                     float randomAngle, float acceleration);
 
     // use initializer
-    void initialize(FountainInitializer init) {
+    void initialize(FInitializer init) {
         initialize(init.levels, init.raysPerStep, init.dropsPerRay,
                    init.dropSize, init.angleMin, init.angleMax,
                    init.randomAngle, init.acceleration);
     }
-    
+
     // render the fountain
     void render() const;
     // update the pool with moved drops

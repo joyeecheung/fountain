@@ -1,8 +1,8 @@
 #include "Basin.h"
 
 void Basin::initialize(const float height, const float borderWidth,
-                const float innerSizeX, const float innerSizeZ,
-                Texture *texture) {
+                       const float innerSizeX, const float innerSizeZ,
+                       Texture *texture) {
     this->height = height;
     this->borderWidth = borderWidth;
     this->innerSizeX = innerSizeX;

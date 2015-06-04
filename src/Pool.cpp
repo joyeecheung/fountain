@@ -105,21 +105,24 @@ void Pool::update(float deltaTime) {
             oscillators[idx].newY = oscillators[idx].y;
 
             if ((i == 0) || (i == oNumX - 1) || (j == 0) || (j == oNumZ - 1)) {
-                ; // NOTE: this condition can make the oscillators
-                  // at the boundaries always have y = 0, which causes a bounce effect.
+                ; /* NOTE: this condition can make the oscillators
+                   * at the boundaries always have y = 0
+                   * which causes a bounce effect. */
             } else { // calculate the new speed
-                // update the speed (i.e.accelerate) according to the 4 neighbors
+                // update the speed (i.e.accelerate)
+                // according to the 4 neighbors
                 float avgdiff = oscillators[idx - 1].y   //left
-                                    + oscillators[idx + 1].y // right
-                                    + oscillators[idx - oNumX].y //upper
-                                    + oscillators[idx + oNumX].y  // lower
-                                    - 4 * oscillators[idx].y;  // subtract itself all at one
+                    + oscillators[idx + 1].y // right
+                    + oscillators[idx - oNumX].y //upper
+                    + oscillators[idx + oNumX].y  // lower
+                    - 4 * oscillators[idx].y;  // subtract itself all at one
 
                 oscillators[idx].speedY += avgdiff * (deltaTime / oWeight);
                 oscillators[idx].speedY *= (1.0f - damping);
 
                 // store the new position.
-                // NOTE: can't just update it because the neighbors needs the old y
+                // NOTE: can't just update it
+                // because the neighbors needs the old y
                 oscillators[idx].newY += oscillators[idx].speedY * deltaTime;
             }
         }

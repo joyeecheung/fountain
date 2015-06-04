@@ -20,7 +20,8 @@ void Texture::load(char *filename, int repeat, int type) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeat);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeat);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     // free memory

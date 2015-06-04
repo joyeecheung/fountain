@@ -19,7 +19,8 @@ public:
     int getHeight() const;
     unsigned int getID() const;
     // load from file
-    void load(char *filename, int repeat = GL_REPEAT, int type = BMP_DEFAULT);
+    void load(char *filename, int repeat = GL_REPEAT,
+              int type = BMP_DEFAULT);
     // bind to the context
     void bind();
 private:

@@ -3,15 +3,17 @@
 void Ground::initialize(float minX, float maxX,
                         float minZ, float maxZ,
                         Texture *groundTexture) {
+    // initialize members
     this->minX = minX;
     this->maxX = maxX;
     this->minZ = minZ;
     this->maxZ = maxZ;
     this->groundTexture = groundTexture;
 
+    // set up display list
     this->listIdx = glGenLists(1);
-
     glNewList(listIdx, GL_COMPILE);
+
     glPushMatrix();
     groundTexture->bind();
     glBegin(GL_QUADS);
@@ -29,6 +31,6 @@ void Ground::initialize(float minX, float maxX,
     glEndList();
 }
 
-void Ground::render() {
+void Ground::render() const {
     glCallList(listIdx);
 }

@@ -45,15 +45,15 @@ const float BASIN_INNER_Z = (OSCILLATORS_NUM_Z * OSCILLATOR_DISTANCE);
  * Fountain Configuration
  ***********************/
 const float DROP_SIZE = 2.0f;
-FountainInitializer initializers[] = {
-    FountainInitializer(4, 100, 100, DROP_SIZE, 75.0f, 90.0f, 0.2f, 0.10f),  // 1
-    FountainInitializer(4, 100, 10, DROP_SIZE, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
-    FountainInitializer(2, 200, 100, DROP_SIZE, 50.0f, 90.0f, 1.5f, 0.13f), // 3
-    FountainInitializer(3, 5, 200, DROP_SIZE, 75.0f, 90.0f, 0.4f, 0.07f), // 4
-    FountainInitializer(3, 100, 85, DROP_SIZE, 30.0f, 90.0f, 0.2f, 0.15f), // 5
-    FountainInitializer(1, 20, 100, DROP_SIZE, 50.0f, 60.0f, 5.0f, 0.13f), // 6
-    FountainInitializer(6, 20, 90, DROP_SIZE, 90.0f, 90.0f, 1.0f, 0.12f), // 7
-    FountainInitializer(2, 30, 200, DROP_SIZE, 85.0f, 85.0f, 10.0f, 0.08f)// 8
+FInitializer initializers[] = {
+    FInitializer(4, 100, 100, DROP_SIZE, 75.0f, 90.0f, 0.2f, 0.10f),  // 1
+    FInitializer(4, 100, 10, DROP_SIZE, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
+    FInitializer(2, 200, 100, DROP_SIZE, 50.0f, 90.0f, 1.5f, 0.13f), // 3
+    FInitializer(3, 5, 200, DROP_SIZE, 75.0f, 90.0f, 0.4f, 0.07f), // 4
+    FInitializer(3, 100, 85, DROP_SIZE, 30.0f, 90.0f, 0.2f, 0.15f), // 5
+    FInitializer(1, 20, 100, DROP_SIZE, 50.0f, 60.0f, 5.0f, 0.13f), // 6
+    FInitializer(6, 20, 90, DROP_SIZE, 90.0f, 90.0f, 1.0f, 0.12f), // 7
+    FInitializer(2, 30, 200, DROP_SIZE, 85.0f, 85.0f, 10.0f, 0.08f)// 8
 };
 
 const float WATER_COLOR[] = { 0.9f, 0.9f, 0.9f, 0.6f };
@@ -63,11 +63,15 @@ const float TIME_DELTA = 0.002f;
  * Lighting configuration
  ***********************/
 const float LIGHT_AMBIENT_1[] = { 0.1f, 0.1f, 0.1f, 0.0f };
-const float LIGHT_DIFFUSE_1[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f };
+const float LIGHT_DIFFUSE_1[] = {
+    211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f
+};
 const float LIGHT_POSITION_1[] = { 0.8f, 0.4f, -0.5f, 0.0f };
 
 const float LIGHT_AMBIENT_2[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-const float LIGHT_DIFFUSE_2[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f };
+const float LIGHT_DIFFUSE_2[] = {
+    211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f
+};
 const float LIGHT_POSITION_2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
 
 
@@ -76,7 +80,8 @@ const float LIGHT_POSITION_2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
  ***********************/
 const float MOVE_FACTOR = 0.1f;
 const float ROTATE_FACTOR = 1.0f;
-const FVector3 CAMERA_POSITION(BASIN_INNER_X / 2.0f, 1.8f, BASIN_INNER_Z + 3.5f);
+const FVector3 CAMERA_POSITION(BASIN_INNER_X / 2.0f, 1.8f,
+                               BASIN_INNER_Z + 3.5f);
 const FVector3 CAMERA_ROTATION(-5.0f, 0.0f);
 
 /***********************
@@ -113,74 +118,74 @@ bool isFullScreen = false;
 
 void keyDown(unsigned char key, int x, int y) {
     switch (key) {
-        /***************************
-         * Camera controls
-         ***************************/
-        case 27:	//ESC
-            exit(0);
-            break;
-        case 'f':
-            if (!isFullScreen) {
-                glutFullScreen();
-                isFullScreen = true;
-            } else {
-                glutReshapeWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
-                isFullScreen = false;
-            }
-            break;
-        case 'r':
-            camera.rotateX(ROTATE_FACTOR);
-            break;
-        case 'v':
-            camera.rotateX(-ROTATE_FACTOR);
-            break;
-        case 'a':
-            camera.moveX(-MOVE_FACTOR);
-            break;
-        case 'd':
-            camera.moveX(MOVE_FACTOR);
-            break;
-        case 's':
-            camera.moveY(-MOVE_FACTOR);
-            break;
-        case 'w':
-            camera.moveY(MOVE_FACTOR);
-            break;
+    /***************************
+     * Camera controls
+     ***************************/
+    case 27:    //ESC
+        exit(0);
+        break;
+    case 'f':
+        if (!isFullScreen) {
+            glutFullScreen();
+            isFullScreen = true;
+        } else {
+            glutReshapeWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+            isFullScreen = false;
+        }
+        break;
+    case 'r':
+        camera.rotateX(ROTATE_FACTOR);
+        break;
+    case 'v':
+        camera.rotateX(-ROTATE_FACTOR);
+        break;
+    case 'a':
+        camera.moveX(-MOVE_FACTOR);
+        break;
+    case 'd':
+        camera.moveX(MOVE_FACTOR);
+        break;
+    case 's':
+        camera.moveY(-MOVE_FACTOR);
+        break;
+    case 'w':
+        camera.moveY(MOVE_FACTOR);
+        break;
 
-        /***************************
-         * Fountain shape control
-         ***************************/
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-            pool.reset();
-            fountain.initialize(initializers[key - '0' - 1]);
-            break;
+    /***************************
+     * Fountain shape control
+     ***************************/
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+        pool.reset();
+        fountain.initialize(initializers[key - '0' - 1]);
+        break;
     }
 }
 
 void spKeyDown(int key, int x, int y) {
     switch (key) {
-        /***************************
-        * Camera controls
-        ***************************/
-        case GLUT_KEY_LEFT:
-            camera.rotateY(ROTATE_FACTOR);
-            break;
-        case GLUT_KEY_RIGHT:
-            camera.rotateY(-ROTATE_FACTOR);
-            break;
-        case GLUT_KEY_UP:
-            camera.moveZ(-MOVE_FACTOR);
-            break;
-        case GLUT_KEY_DOWN:
-            camera.moveZ(MOVE_FACTOR);
-            break;
+    /***************************
+    * Camera controls
+    ***************************/
+    case GLUT_KEY_LEFT:
+        camera.rotateY(ROTATE_FACTOR);
+        break;
+    case GLUT_KEY_RIGHT:
+        camera.rotateY(-ROTATE_FACTOR);
+        break;
+    case GLUT_KEY_UP:
+        camera.moveZ(-MOVE_FACTOR);
+        break;
+    case GLUT_KEY_DOWN:
+        camera.moveZ(MOVE_FACTOR);
+        break;
     }
 }
 
@@ -196,13 +201,13 @@ void drawScene(void) {
     // sky
     glDisable(GL_LIGHTING);
     skybox.render();
-    
+
     // water in the air
     glDisable(GL_TEXTURE_2D);
     glColor4fv(WATER_COLOR);
     fountain.render();
     glEnable(GL_LIGHTING);
-    
+
     glDisable(GL_BLEND);
 }
 
@@ -212,8 +217,8 @@ void display(void) {
 
     camera.render();
 
+    glLightfv(GL_LIGHT0, GL_POSITION, LIGHT_POSITION_1);
     glLightfv(GL_LIGHT0, GL_POSITION, LIGHT_POSITION_2);
-    //Turn two sided lighting on:
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     drawScene();
@@ -227,7 +232,7 @@ void reshape(int x, int y) {
     glLoadIdentity();
     gluPerspective(FIELD_OF_VIEW, (GLdouble)x / (GLdouble)y,
                    CLIP_NEAR, CLIP_FAR);
-    glViewport(0, 0, x, y);  //Use the whole window for rendering
+    glViewport(0, 0, x, y);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -287,7 +292,7 @@ int main(int argc, char **argv) {
     fountain.center = FVector3(BASIN_INNER_X / 2.0f, POOL_HEIGHT,
                                BASIN_INNER_Z / 2.0f);
 
-    // initialize camera: 
+    // initialize camera:
     camera.move(CAMERA_POSITION);
     camera.rotate(CAMERA_ROTATION);
 
@@ -305,7 +310,7 @@ int main(int argc, char **argv) {
     glLightfv(GL_LIGHT1, GL_DIFFUSE, LIGHT_DIFFUSE_1);
     glLightfv(GL_LIGHT1, GL_POSITION, LIGHT_POSITION_1);
     glEnable(GL_LIGHT1);
-   
+
     glLightfv(GL_LIGHT2, GL_AMBIENT, LIGHT_AMBIENT_2);
     glLightfv(GL_LIGHT2, GL_DIFFUSE, LIGHT_DIFFUSE_2);
     glLightfv(GL_LIGHT2, GL_POSITION, LIGHT_POSITION_2);

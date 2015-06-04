@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include "Texture.h"
 
+// sky box face indices
 #define SKY_FRONT 0
 #define SKY_RIGHT 1
 #define SKY_LEFT 2

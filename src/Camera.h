@@ -5,7 +5,7 @@
 #include "FVector.h"
 
 /*****
-  Note: angles are all in [0, 90]
+ * Note: angles are all in [0, 90]
  ****/
 class Camera {
 public:
@@ -14,7 +14,7 @@ public:
                directionChanged(false),
                rotation(0.0f, 0.0f, 0.0f) {}
     /* Executes glRotate and glTranslate.
-       Should be called after calling glLoadIdentity. */
+     * Should be called after calling glLoadIdentity. */
     void render(void) const;
     void move(const FVector3 & direction);
     void moveX(float distance);
@@ -27,7 +27,7 @@ public:
 private:
     FVector3 position;
     /* needs to mark the update by setting directionChanged to true
-       before calling any move function */
+     * before calling any move function */
     FVector3 direction; 
     bool directionChanged;
     FVector3 rotation;

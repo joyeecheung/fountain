@@ -21,12 +21,12 @@ void Drop::setTime(float newTime) {
 }
 
 void Drop::updatePosition(FVector3 & position, float dtime,
-                           Pool & pool, Fountain & fountain) {
+                          Pool & pool, Fountain & fountain) {
     time += dtime * 20.0f;
     if (time > 0.0f) {
         FVector3 newPosition(speed.x * time,
-                          speed.y * time - acceleration * time * time,
-                          speed.z * time);
+                             speed.y * time - acceleration * time * time,
+                             speed.z * time);
         position = newPosition;
         if (newPosition.y < 0.0) { /* the drop has fallen into the water */
             /* if there are too many drops per ray several drops would be seen as one.
@@ -69,9 +69,9 @@ void Fountain::initialize(int levels, int raysPerStep, int dropsPerRay, float dr
             for (int drop = 0; drop < dropsPerRay; drop++) {
                 randAcc = acceleration + randf(0.005f);
                 if (levels > 1) {
-                    int newAngle = angleMin +
-                        (angleMax - angleMin) * float(level) / (levels - 1);
-                    angleZ = newAngle + randf(randomAngle);
+                    int newAngle = (angleMax - angleMin)
+                                   * float(level) / (levels - 1);
+                    angleZ = angleMin + newAngle + randf(randomAngle);
                 } else {
                     angleZ = angleMin + randf(randomAngle);
                 }

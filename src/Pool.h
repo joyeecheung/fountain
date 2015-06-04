@@ -25,7 +25,7 @@ public:
          float oDistance, float oWeight, float damping, float splash,
          float texRepeatX, float texRepeatZ,
          Texture *floorTexture)
-         : oscillators(nullptr), indices(nullptr) {
+        : oscillators(nullptr), indices(nullptr) {
         initialize(oNumX, oNumZ, height,
                    oDistance, oWeight, damping, splash,
                    texRepeatX, texRepeatZ,
@@ -51,7 +51,7 @@ public:
     // update the oscillator at a position
     // this should be caused by a drop
     void splashOscillator(int idxX, int idxZ);
-    void update(float deltaTime);    
+    void update(float deltaTime);
     void reset();
 
     ~Pool() {
@@ -62,7 +62,7 @@ private:
     Oscillator * oscillators;  // oscillators for simulating the waves
     int *indices;  // indices for drawing
     Texture *floorTexture;  // texture for the floor of the pool
-    
+
     float oDistance; // distance between oscillators
     float oWeight;  //  weight of oscillators
     int oNumX, oNumZ;  // number of oscillators in the pool
