@@ -4,19 +4,19 @@
 
 #define RAND_FACTOR 2.0f
 
-GLfloat randf(GLfloat range) {
-    return (GLfloat)rand() / (GLfloat)RAND_MAX * range * RAND_FACTOR;
+float randf(float range) {
+    return (float)rand() / (float)RAND_MAX * range * RAND_FACTOR;
 }
 
 void Drop::setSpeed(FVector3 newSpeed) {
     speed = newSpeed;
 }
 
-void Drop::setAcceleration(GLfloat newAcc) {
+void Drop::setAcceleration(float newAcc) {
     acc = newAcc;
 }
 
-void Drop::setTime(GLfloat newTime) {
+void Drop::setTime(float newTime) {
     time = newTime;
 }
 
@@ -51,24 +51,25 @@ void Drop::updatePosition(FVector3 & vertex, float dtime,
 
 /********************************************************************/
 
-void Fountain::initialize(GLint levels, GLint raysPerStep, GLint dropsPerRay,
-                          GLfloat angleMin, GLfloat angleMax,
-                          GLfloat randomAngle, GLfloat acceleration) {
+void Fountain::initialize(int levels, int raysPerStep, int dropsPerRay, float dropSize,
+                          float angleMin, float angleMax,
+                          float randomAngle, float acceleration) {
     //This function needn't be and isn't speed optimized
     this->center = center;
 
     this->numDrops = levels * raysPerStep * dropsPerRay;
+    this->dropSize = dropSize;
 
     if (this->drops != nullptr) delete[] this->drops;
     if (this->vertices != nullptr) delete[] this->vertices;
     this->drops = new Drop[numDrops];
     this->vertices = new FVector3[numDrops];
 
-    GLfloat randAcc; // acceleration changed randomly
-    GLfloat initialTime;  // initial elapsed time for each drop
+    float randAcc; // acceleration changed randomly
+    float initialTime;  // initial elapsed time for each drop
     FVector3 initialSpeed;  // initial speed for each drop
-    GLfloat angleZ; // angle in the front view
-    GLfloat angleY;  // angle in the top view
+    float angleZ; // angle in the front view
+    float angleY;  // angle in the top view
 
     for (int k = 0; k < levels; k++) {
         for (int j = 0; j < raysPerStep; j++) {
@@ -76,7 +77,7 @@ void Fountain::initialize(GLint levels, GLint raysPerStep, GLint dropsPerRay,
                 randAcc = acceleration + randf(0.005f);
                 if (levels > 1) {
                     angleZ = angleMin + (angleMax - angleMin)
-                    *GLfloat(k) / (levels - 1) + randf(randomAngle);
+                    *float(k) / (levels - 1) + randf(randomAngle);
                 } else {
                     angleZ = angleMin + randf(randomAngle);
                 }
@@ -87,7 +88,7 @@ void Fountain::initialize(GLint levels, GLint raysPerStep, GLint dropsPerRay,
 
                 // speed update by rays
                 // +12.0 causes a rotation (12?
-                angleY = (GLfloat)j / (GLfloat)raysPerStep * 360.0f + 12.0f;
+                angleY = (float)j / (float)raysPerStep * 360.0f + 12.0f;
 
                 // for the next computations "newSpeed.x" is the radius.
                 // DON'T swap the two lines, because the second one changes newSpeed.x
@@ -120,7 +121,7 @@ void Fountain::render() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
-    glPointSize(2.0);
+    glPointSize(dropSize);
     glVertexPointer(3,          // x, y, z-components
                     GL_FLOAT,   // data type of SVertex
                     0,         // the vertices are tightly packed

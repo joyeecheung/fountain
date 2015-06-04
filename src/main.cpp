@@ -24,7 +24,7 @@ const float GROUND_SIZE = 30.0f;
  ***********************/
 const int NUM_X_OSCILLATORS = 180;
 const int NUM_Z_OSCILLATORS = 180;
-const float OSCILLATOR_DISTANCE = 0.020f;
+const float OSCILLATOR_DISTANCE = 0.023f;
 const float OSCILLATOR_WEIGHT = 0.00005f;
 const float POOL_SIZE_X = (NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE);
 const float POOL_SIZE_Z = (NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE);
@@ -42,25 +42,27 @@ const float BASIN_BORDER_HEIGHT = 0.2f;
 /***********************
  * Fountain Configuration
  ***********************/
+const float DROP_SIZE = 2.0f;
 FountainInitializer initializers[] = {
-    FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.09f),  // 1
-    FountainInitializer(4, 100, 10, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
-    FountainInitializer(2, 70, 50, 40.0f, 90.0f, 1.5f, 0.13f), // 3
-    FountainInitializer(3, 5, 200, 75.0f, 90.0f, 0.4f, 0.07f), // 4
-    FountainInitializer(3, 100, 85, 30.0f, 90.0f, 0.2f, 0.15f), // 5
-    FountainInitializer(1, 20, 100, 50.0f, 60.0f, 5.0f, 0.13f), // 6
-    FountainInitializer(6, 20, 90, 90.0f, 90.0f, 1.0f, 0.12f), // 7
-    FountainInitializer(2, 30, 200, 85.0f, 85.0f, 10.0f, 0.08f)// 8
+    FountainInitializer(4, 100, 100, DROP_SIZE, 75.0f, 90.0f, 0.2f, 0.10f),  // 1
+    FountainInitializer(4, 100, 10, DROP_SIZE, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
+    FountainInitializer(2, 200, 100, DROP_SIZE, 50.0f, 90.0f, 1.5f, 0.13f), // 3
+    FountainInitializer(3, 5, 200, DROP_SIZE, 75.0f, 90.0f, 0.4f, 0.07f), // 4
+    FountainInitializer(3, 100, 85, DROP_SIZE, 30.0f, 90.0f, 0.2f, 0.15f), // 5
+    FountainInitializer(1, 20, 100, DROP_SIZE, 50.0f, 60.0f, 5.0f, 0.13f), // 6
+    FountainInitializer(6, 20, 90, DROP_SIZE, 90.0f, 90.0f, 1.0f, 0.12f), // 7
+    FountainInitializer(2, 30, 200, DROP_SIZE, 85.0f, 85.0f, 10.0f, 0.08f)// 8
 };
 
-const float WATER_COLOR[] = { 1.0f, 1.0f, 1.0f, 0.6f };
-const float SPLASH = 0.03f;
+const float WATER_COLOR[] = { 0.9f, 0.9f, 0.9f, 0.6f };
+const float SPLASH = -0.03f;
+const float TIME_DELTA = 0.002f;
 
 /***********************
  * Lighting configuration
  ***********************/
 GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-GLfloat lightDiffuse1[] = { 0.8f, 0.8f, 0.8f, 0.0f };
+GLfloat lightDiffuse1[] = { 211.0f / 255.0f, 183.0f / 255.0f, 133.0f / 255.0f, 0.0f };
 GLfloat lightPosition1[] = { 0.8f, 0.4f, -0.5f, 0.0f };
 
 GLfloat lightAmbient2[] = { 0.1f, 0.1f, 0.1f, 0.0f };
@@ -182,26 +184,24 @@ void spKeyDown(int key, int x, int y) {
 }
 
 void drawScene(void) {
-    glEnable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
 
+    glEnable(GL_LIGHTING);
     // set up the scene
     pool.render();
     basin.render();
     ground.render();
-
     // sky
     glDisable(GL_LIGHTING);
-    skybox.render();    
-    glEnable(GL_LIGHTING);
-
+    skybox.render();
+    
     // water in the air
     glDisable(GL_TEXTURE_2D);
-    glDisable(GL_LIGHTING);
     glColor4fv(WATER_COLOR);
     fountain.render();
-
+    glEnable(GL_LIGHTING);
+    
     glDisable(GL_BLEND);
 }
 
@@ -211,7 +211,7 @@ void display(void) {
 
     camera.render();
 
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition1);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition2);
     //Turn two sided lighting on:
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
@@ -231,10 +231,9 @@ void reshape(int x, int y) {
 }
 
 void idle(void) {
-    //Do the physical calculation for one step:
-    float dtime = 0.002f;
-    fountain.update(dtime, &pool);
-    pool.update(dtime);
+    // update the fountain and the pool
+    fountain.update(TIME_DELTA, &pool);
+    pool.update(TIME_DELTA);
 
     //render the scene:
     display();
@@ -299,12 +298,11 @@ int main(int argc, char **argv) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
 
-    // lighting
     glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
     glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
     glEnable(GL_LIGHT1);
-
+    // lighting
     glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
     glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
     glLightfv(GL_LIGHT2, GL_POSITION, lightPosition2);
