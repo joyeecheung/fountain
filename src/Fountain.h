@@ -54,10 +54,8 @@ public:
     }
 
     void initialize(GLint levels, GLint raysPerStep, GLint dropsPerRay,
-                    GLfloat angleMin,
-                    GLfloat angleMax,
-                    GLfloat randomAngle,
-                    GLfloat acceleration);
+                    GLfloat angleMin, GLfloat angleMax,
+                    GLfloat randomAngle, GLfloat acceleration);
 
     void initialize(FountainInitializer init) {
         initialize(init.levels, init.raysPerStep, init.dropsPerRay, init.angleMin,
@@ -72,7 +70,7 @@ public:
     }
 
     GLint numDrops;
-    FVector3 position;
+    FVector3 center;
 private:
     FVector3 * vertices;
     Drop * drops;

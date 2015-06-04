@@ -39,8 +39,8 @@ void Drop::updatePosition(FVector3 & vertex, float dtime,
 
             // The drop creates a little wave in the pool:
             float distance = pool->getODistance();
-            int oX = (int)((position.x + fountain->position.x) / distance);
-            int oZ = (int)((position.z + fountain->position.z) / distance);
+            int oX = (int)((position.x + fountain->center.x) / distance);
+            int oZ = (int)((position.z + fountain->center.z) / distance);
             // change this to make the waves stronger/weaker
             pool->updateOscillator(oX, oZ, -0.1f);
         }
@@ -51,20 +51,19 @@ void Drop::updatePosition(FVector3 & vertex, float dtime,
 
 /********************************************************************/
 
-
 void Fountain::initialize(GLint levels, GLint raysPerStep, GLint dropsPerRay,
-                              GLfloat angleMin,
-                              GLfloat angleMax,
-                              GLfloat randomAngle,
-                              GLfloat acceleration) {
+                          GLfloat angleMin, GLfloat angleMax,
+                          GLfloat randomAngle, GLfloat acceleration) {
     //This function needn't be and isn't speed optimized
+    this->center = center;
 
-    numDrops = levels * raysPerStep * dropsPerRay;
+    this->numDrops = levels * raysPerStep * dropsPerRay;
 
-    if (drops != nullptr) delete [] drops;
-    if (vertices != nullptr) delete [] vertices;
-    drops = new Drop[numDrops];
-    vertices = new FVector3[numDrops];
+    if (this->drops != nullptr) delete[] this->drops;
+    if (this->vertices != nullptr) delete[] this->vertices;
+    this->drops = new Drop[numDrops];
+    this->vertices = new FVector3[numDrops];
+
     GLfloat randAcc; // acceleration changed randomly
     GLfloat initialTime;  // initial elapsed time for each drop
     FVector3 initialSpeed;  // initial speed for each drop
@@ -127,7 +126,8 @@ void Fountain::render() {
                     0,         // the vertices are tightly packed
                     vertices);
     glPushMatrix();
-    glTranslatef(position.x, position.y, position.z);
+    // move the fountain to the center of the pool
+    glTranslatef(center.x, center.y, center.z);
     glDrawArrays(GL_POINTS, 0, numDrops);
 
     glPopMatrix();

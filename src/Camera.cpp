@@ -3,35 +3,40 @@
 #include "windows.h"
 #include "Camera.h"
 
-void Camera::move(FVector3 dir) {
+void Camera::move(const FVector3 &dir) {
     position.addBy(dir);
 }
 
-void Camera::moveZ(GLfloat delta) {
-    if (directionChanged)
-        updateDirection();
-    FVector3 moveVector(direction.x * -delta,
-                        direction.y * -delta,
-                        direction.z * -delta);
-    position.addBy(moveVector);
+void Camera::rotate(const FVector3 &dir) {
+    rotation.addBy(dir);
 }
 
 void Camera::moveX(GLfloat delta) {
     if (directionChanged)
         updateDirection();
-    FVector3 moveVector(direction.z * -delta,
-                        0.0f,
-                        -direction.x * -delta);
-    position.addBy(moveVector);
+    position.x += delta;
+}
+
+void Camera::moveY(GLfloat delta) {
+    if (directionChanged)
+        updateDirection();
+    position.y += delta;
+}
+
+void Camera::moveZ(GLfloat delta) {
+    if (directionChanged)
+        updateDirection();
+    position.z += delta;
+}
+
+
+void Camera::rotateX(GLfloat angle) {
+    rotation.x += angle;
+    directionChanged = true;
 }
 
 void Camera::rotateY(GLfloat angle) {
     rotation.y += angle;
-    directionChanged = true;
-}
-
-void Camera::rotateX(GLfloat angle) {
-    rotation.x += angle;
     directionChanged = true;
 }
 

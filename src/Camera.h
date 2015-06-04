@@ -15,10 +15,11 @@ public:
     /* Executes glRotate and glTranslate.
        Should be called after calling glLoadIdentity. */
     void render(void) const;
-    void move(FVector3 direction);
-    void moveZ(GLfloat distance);
+    void move(const FVector3 & direction);
     void moveX(GLfloat distance);
-    void rotate(FVector3 angles);
+    void moveY(GLfloat distance);
+    void moveZ(GLfloat distance);
+    void rotate(const FVector3 & angles);
     void rotateX(GLfloat angle);
     void rotateY(GLfloat angle);
     void rotateZ(GLfloat angle);

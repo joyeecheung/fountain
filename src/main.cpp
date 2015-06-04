@@ -8,101 +8,122 @@
 #include "Pool.h"
 #include "Fountain.h"
 #include "Basin.h"
-#include "Camera.h"  //This is my old camera, but it's easier to control 
-//for the user and the third rotation axis is not required here
+#include "Camera.h"
 #include "Texture.h"
 #include "SkyBox.h"
 #include "Ground.h"
 
-//lighting:
-GLfloat lightAmbient[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 0.0f };
-GLfloat lightPosition[] = {0.8f, 0.4f, -0.5f, 0.0f };
+/***********************
+* Sky and ground Configuration
+***********************/
+const float SKY_BOX_SIZE = 20.0f;
+const float GROUND_SIZE = 20.0f;
 
-GLfloat lightAmbient2[] = { 0.1f, 0.1f, 0.1f, 0.0f };
-GLfloat lightDiffuse2[] = { 0.3f, 0.3f, 0.3f, 0.0f };
-GLfloat lightPosition2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
-
-//Constants:
+/***********************
+ * Pool Configuration
+ ***********************/
 const int NUM_X_OSCILLATORS = 180;
 const int NUM_Z_OSCILLATORS = 180;
 const float OSCILLATOR_DISTANCE = 0.020f;
 const float OSCILLATOR_WEIGHT = 0.00005f;
-const float MAXX = (NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE);
-const float MAXZ = (NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE);
+const float POOL_SIZE_X = (NUM_X_OSCILLATORS*OSCILLATOR_DISTANCE);
+const float POOL_SIZE_Z = (NUM_Z_OSCILLATORS*OSCILLATOR_DISTANCE);
 const float POOL_HEIGHT = 0.2f;
-const float MOVE_FACTOR = 0.1f;
-const float ROTATE_FACTOR = 1.0f;
+const float DAMPING = 0.015f;
+const float POOL_TEX_REPEAT_X = 2.0f;
+const float POOL_TEX_REPEAT_Z = 2.0f;
 
+/***********************
+* Basin Configuration
+***********************/
+const float BASIN_BORDER_WIDTH = 0.4f;
+const float BASIN_BORDER_HEIGHT = 0.2f;
+
+/***********************
+* Fountain Configuration
+***********************/
 FountainInitializer initializers[] = {
     FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.09f),  // 1
     FountainInitializer(4, 100, 8, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
-    FountainInitializer(2, 70, 40, 40.0f, 85.0f, 1.5f, 0.13f), // 3
+    FountainInitializer(2, 70, 40, 40.0f, 90.0f, 1.5f, 0.13f), // 3
     FountainInitializer(3, 5, 200, 75.0f, 90.0f, 0.4f, 0.07f), // 4
-    FountainInitializer(3, 100, 45, 20.0f, 90.0f, 0.2f, 0.15f), // 5
+    FountainInitializer(3, 100, 45, 30.0f, 90.0f, 0.2f, 0.15f), // 5
     FountainInitializer(1, 20, 100, 50.0f, 60.0f, 5.0f, 0.13f), // 6
     FountainInitializer(6, 20, 90, 90.0f, 90.0f, 1.0f, 0.12f), // 7
     FountainInitializer(2, 30, 200, 85.0f, 85.0f, 10.0f, 0.08f)// 8
 };
 
-//Camera object:
+/***********************
+* Lighting configuration
+***********************/
+GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+GLfloat lightDiffuse1[] = { 0.8f, 0.8f, 0.8f, 0.0f };
+GLfloat lightPosition1[] = { 0.8f, 0.4f, -0.5f, 0.0f };
+
+GLfloat lightAmbient2[] = { 0.1f, 0.1f, 0.1f, 0.0f };
+GLfloat lightDiffuse2[] = { 0.3f, 0.3f, 0.3f, 0.0f };
+GLfloat lightPosition2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
+
+
+/***********************
+ * Camera Configuration
+ ***********************/
+const float MOVE_FACTOR = 0.1f;
+const float ROTATE_FACTOR = 1.0f;
+const FVector3 CAMERA_POSITION(POOL_SIZE_X / 2.0f, 1.8f, POOL_SIZE_Z + 3.5f);
+const FVector3 CAMERA_ROTATION(-5.0f, 0.0f);
+
+/***********************
+ * Objects in the scene
+ ***********************/
 Camera camera;
 
-//The "pool" which represents the water within the fountain basin
+// Water and the floor in the basin
 Pool pool;
 
-//water outside the basin is in the air:
+// Water in the air
 Fountain fountain;
 
-// The basin of the foutain
+// Basin of the fountain
 Basin basin;
 
+// Sky
 Skybox skybox;
 
+// The ground
 Ground ground;
 
-bool  g_bRain = true;
-bool  g_bFillModePoints = true;
-bool  g_bLighting = true;
 
 void keyDown(unsigned char key, int x, int y) {
     switch (key) {
+        /***************************
+         * Camera controls
+         ***************************/
         case 27:	//ESC
             exit(0);
             break;
-        case 'a':
-            camera.rotateY(ROTATE_FACTOR);
-            break;
-        case 'd':
-            camera.rotateY(-ROTATE_FACTOR);
-            break;
-        case 'w':
-            camera.moveZ(-MOVE_FACTOR);
-            break;
-        case 's':
-            camera.moveZ(MOVE_FACTOR);
-            break;
-        case 'x':
+        case 'r':
             camera.rotateX(ROTATE_FACTOR);
             break;
-        case 'y':
+        case 'f':
             camera.rotateX(-ROTATE_FACTOR);
             break;
-        case 'c':
+        case 'a':
             camera.moveX(-MOVE_FACTOR);
             break;
-        case 'v':
+        case 'd':
             camera.moveX(MOVE_FACTOR);
             break;
-        case 'f':
-            camera.move(FVector3(0.0f, -MOVE_FACTOR, 0.0f));
+        case 's':
+            camera.moveY(-MOVE_FACTOR);
             break;
-        case 'r':
-            camera.move(FVector3(0.0f, MOVE_FACTOR, 0.0f));
+        case 'w':
+            camera.moveY(MOVE_FACTOR);
             break;
 
-            //*************************************
-            //Several initialization calls:
+        /***************************
+         * Fountain shape control
+         ***************************/
         case '1':
         case '2':
         case '3':
@@ -117,9 +138,29 @@ void keyDown(unsigned char key, int x, int y) {
     }
 }
 
+void spKeyDown(int key, int x, int y) {
+    switch (key) {
+        /***************************
+        * Camera controls
+        ***************************/
+        case GLUT_KEY_LEFT:
+            camera.rotateY(ROTATE_FACTOR);
+            break;
+        case GLUT_KEY_RIGHT:
+            camera.rotateY(-ROTATE_FACTOR);
+            break;
+        case GLUT_KEY_UP:
+            camera.moveZ(-MOVE_FACTOR);
+            break;
+        case GLUT_KEY_DOWN:
+            camera.moveZ(MOVE_FACTOR);
+            break;
+    }
+}
+
 void drawScene(void) {
 
-    //Render the pool
+    // render the pool
     glEnable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
     glPushMatrix();
@@ -150,7 +191,7 @@ void display(void) {
 
     camera.render();
 
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition1);
     //Turn two sided lighting on:
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
@@ -210,22 +251,28 @@ int main(int argc, char **argv) {
     skyboxTextures[SKY_UP].load("resource/skybox/up.bmp", GL_CLAMP_TO_EDGE);
     skyboxTextures[SKY_DOWN].load("resource/skybox/down.bmp", GL_CLAMP_TO_EDGE);
 
-    skybox.initialize(-20.0f, 20.0f, -20.0f, 20.0f, -20.0f, 20.0f, skyboxTextures);
-    //compute the vertices and indices
+    skybox.initialize(-SKY_BOX_SIZE, SKY_BOX_SIZE,
+                      -SKY_BOX_SIZE, SKY_BOX_SIZE,
+                      -SKY_BOX_SIZE, SKY_BOX_SIZE, skyboxTextures);
+
     pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS,
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
-                    0.03f, 4.0f, 4.0f, &waterTexture);
-    //init the airfountain: (look at KeyDown() to see more possibilities of initialization)
-    fountain.initialize(initializers[0]);
-    basin.initialize(0.2f + POOL_HEIGHT, 0.4f, MAXX, MAXZ, &rockTexture);
-    ground.initialize(-20.0f, 20.0f, -20.0f, 20.0f, &groundTexture);
+                    DAMPING, POOL_TEX_REPEAT_X, POOL_TEX_REPEAT_Z,
+                    &waterTexture);
 
-    //place it in the center of the pool:
-    fountain.position = FVector3(MAXX / 2.0f,
-                                 POOL_HEIGHT,
-                                 MAXZ / 2.0f);
+    fountain.initialize(initializers[0]);
+
+    basin.initialize(BASIN_BORDER_HEIGHT + POOL_HEIGHT, BASIN_BORDER_WIDTH,
+                     POOL_SIZE_X, POOL_SIZE_Z, &rockTexture);
+
+    ground.initialize(-GROUND_SIZE, GROUND_SIZE,
+                      -GROUND_SIZE, GROUND_SIZE, &groundTexture);
+
+    // place the fountain in the center of the pool
+    fountain.center = FVector3(POOL_SIZE_X / 2.0f, POOL_HEIGHT, POOL_SIZE_Z / 2.0f);
+
     //initialize camera: 
-    camera.move(FVector3(MAXX / 2.0f, 1.8f, MAXZ + 3.5f));
+    camera.move(FVector3(POOL_SIZE_X / 2.0f, 1.8f, POOL_SIZE_Z + 3.5f));
     camera.rotateY(0);
     camera.rotateX(-5);
 
@@ -235,15 +282,13 @@ int main(int argc, char **argv) {
     glEnableClientState(GL_NORMAL_ARRAY);
 
     //Switch on solid rendering:
-    g_bFillModePoints = false;
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
 
     //Initialize lighting:
-    g_bLighting = true;
-    glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
-    glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+    glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
     glEnable(GL_LIGHT1);
 
     glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
@@ -269,18 +314,19 @@ int main(int argc, char **argv) {
     //initialize generation of random numbers:
     srand((unsigned)time(NULL));
 
-    printf("1-7:\tChange the shape of the fountain\n");
-    printf("w, s:\tMove camera forward/backword\n");
-    printf("a, d:\tturn camera right / left\n");
-    printf("r, f:\tmove camera up / down\n");
-    printf("x, y:\tturn camera up / down\n");
-    printf("c, v:\tstrafe left / right\n");
-    printf("esc:\texit\n");
+    printf("1 - 7:\tChange the shape of the fountain\n");
+    printf("up, down:\tMove camera forward / backword\n");
+    printf("left, right:\tTurn camera right / left\n");
+    printf("r, f:\tTurn camera up / down\n");
+    printf("w, s:\tMove camera up / down\n");
+    printf("a, d:\tMove camera left / right\n");
+    printf("ESC:\texit\n");
 
     //Assign the two used Msg-routines
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyDown);
+    glutSpecialFunc(spKeyDown);
     glutIdleFunc(idle);
     //Let GLUT get the msgs
     glutMainLoop();
