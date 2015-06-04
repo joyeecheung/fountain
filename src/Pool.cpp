@@ -3,23 +3,24 @@
 #include "Pool.h"
 #include "FVector.h"  //3d-vectors, my own routines...
 
-using namespace std;
-
-void Pool::initialize(int sizeX, int sizeZ, float oDistance,
-                      float oWeight, float damping,
+void Pool::initialize(int sizeX, int sizeZ, float height,
+                      float oDistance, float oWeight,
+                      float damping, float splash,
                       float texSizeX, float texSizeZ,
                       Texture * floorTexture) {
     //assign member variables
     this->sizeX = sizeX;
     this->sizeZ = sizeZ;
+    this->height = height;
     this->oscillatorsNum = sizeX * sizeZ;
     this->oDistance = oDistance;
     this->oWeight = oWeight;
     this->damping = damping;
+    this->splash = splash;
     this->floorTexture = floorTexture;
 
     //temporary vector for indies:
-    vector <GLuint> idxVector;  // we first put the indices into this vector
+    std::vector <GLuint> idxVector;  // we first put the indices into this vector
     // then copy them to the array below
 
     if (oscillators != nullptr) delete [] oscillators;
@@ -79,12 +80,12 @@ void Pool::reset() {
     }
 }
 
-void Pool::updateOscillator(int posX, int posZ, float deltaY) {
+void Pool::updateOscillator(int posX, int posZ) {
     if ((posX >= 0) && (posX < sizeX) && (posZ >= 0) && (posZ < sizeZ)) {
         // THIS LINE IS REQUIRED FOR FOUNTAINS WITH MANY DROPS!!!
         int idx = posX + posZ * sizeX;
         if (oscillators[idx].y > -0.15)
-            oscillators[idx].y += deltaY;
+            oscillators[idx].y += splash;
     }
 }
 
@@ -211,6 +212,8 @@ void Pool::update(float deltaTime) {
 }
 
 void Pool::render() {
+    glPushMatrix();
+    glTranslatef(0.0f, height, 0.0f);
     floorTexture->bind();
     // There might be more vertex arrays.
     // Thus, pass the pointers each time you use them:
@@ -237,6 +240,7 @@ void Pool::render() {
                    indicesNum,  //count, ie. how many indices
                    GL_UNSIGNED_INT, //type of the index array
                    indices);
+    glPopMatrix();
 }
 
 float Pool::getODistance() {

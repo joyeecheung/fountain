@@ -42,7 +42,7 @@ void Drop::updatePosition(FVector3 & vertex, float dtime,
             int oX = (int)((position.x + fountain->center.x) / distance);
             int oZ = (int)((position.z + fountain->center.z) / distance);
             // change this to make the waves stronger/weaker
-            pool->updateOscillator(oX, oZ, -0.1f);
+            pool->updateOscillator(oX, oZ);
         }
     } else {
         vertex.set(0.0f, 0.0f, 0.0f);

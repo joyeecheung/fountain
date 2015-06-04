@@ -11,6 +11,7 @@ void Ground::initialize(float minX, float maxX,
     this->listIdx = glGenLists(1);
 
     glNewList(listIdx, GL_COMPILE);
+    glPushMatrix();
     groundTexture->bind();
     glBegin(GL_QUADS);
     glNormal3f(0.0f, 1.0f, 0.0);
@@ -23,6 +24,7 @@ void Ground::initialize(float minX, float maxX,
     glTexCoord2f(0.0, 1.0);
     glVertex3f(minX, 0.0, maxZ);
     glEnd();
+    glPopMatrix();
     glEndList();
 }
 

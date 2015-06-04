@@ -17,23 +17,24 @@ struct Oscillator {
 class Pool {
 public:
     Pool() : oscillators(nullptr), indices(nullptr) {}
-    Pool(int sizeX, int sizeZ, float odistance,
-         float oweight, float damping,
+    Pool(int sizeX, int sizeZ, float height,
+         float odistance, float oweight, float damping, float splash,
          float textureStretchX, float textureStretchZ,
          Texture *floorTexture)
          : oscillators(nullptr), indices(nullptr) {
-        initialize(sizeX, sizeZ, odistance,
-                   oweight, damping,
+        initialize(sizeX, sizeZ, height,
+                   odistance, oweight, damping, splash,
                    textureStretchX, textureStretchZ,
                    floorTexture);
     }
-    /* Oscillator distance */
-    float getODistance();
-    void initialize(int sizeX, int sizeZ, float odistance,
-                    float oweight, float damping,
+    void initialize(int sizeX, int sizeZ, float height,
+                    float odistance, float oweight,
+                    float damping, float splash,
                     float textureStretchX, float textureStretchZ,
                     Texture *floorTexture);
-    void updateOscillator(int posX, int posZ, float deltaY);
+    /* Oscillator distance */
+    float getODistance();
+    void updateOscillator(int posX, int posZ);
     void update(float deltaTime);
     void render();
     void reset();
@@ -47,12 +48,10 @@ private:
     GLuint *indices;
     Texture *floorTexture;
     int oscillatorsNum;  // sizeX * sizeZ
-    float oDistance;
-    float oWeight;
-
+    float oDistance, oWeight, splash, damping;
     int sizeX, sizeZ;
+    float height;
     int indicesNum;
-    float damping;
 };
 
 #endif

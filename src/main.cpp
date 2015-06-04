@@ -14,10 +14,10 @@
 #include "Ground.h"
 
 /***********************
-* Sky and ground Configuration
-***********************/
-const float SKY_BOX_SIZE = 20.0f;
-const float GROUND_SIZE = 20.0f;
+ * Sky and ground Configuration
+ ***********************/
+const float SKY_BOX_SIZE = 30.0f;
+const float GROUND_SIZE = 30.0f;
 
 /***********************
  * Pool Configuration
@@ -34,28 +34,31 @@ const float POOL_TEX_REPEAT_X = 2.0f;
 const float POOL_TEX_REPEAT_Z = 2.0f;
 
 /***********************
-* Basin Configuration
-***********************/
+ * Basin Configuration
+ ***********************/
 const float BASIN_BORDER_WIDTH = 0.4f;
 const float BASIN_BORDER_HEIGHT = 0.2f;
 
 /***********************
-* Fountain Configuration
-***********************/
+ * Fountain Configuration
+ ***********************/
 FountainInitializer initializers[] = {
     FountainInitializer(4, 100, 45, 76.0f, 90.0f, 0.2f, 0.09f),  // 1
-    FountainInitializer(4, 100, 8, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
-    FountainInitializer(2, 70, 40, 40.0f, 90.0f, 1.5f, 0.13f), // 3
+    FountainInitializer(4, 100, 10, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
+    FountainInitializer(2, 70, 50, 40.0f, 90.0f, 1.5f, 0.13f), // 3
     FountainInitializer(3, 5, 200, 75.0f, 90.0f, 0.4f, 0.07f), // 4
-    FountainInitializer(3, 100, 45, 30.0f, 90.0f, 0.2f, 0.15f), // 5
+    FountainInitializer(3, 100, 85, 30.0f, 90.0f, 0.2f, 0.15f), // 5
     FountainInitializer(1, 20, 100, 50.0f, 60.0f, 5.0f, 0.13f), // 6
     FountainInitializer(6, 20, 90, 90.0f, 90.0f, 1.0f, 0.12f), // 7
     FountainInitializer(2, 30, 200, 85.0f, 85.0f, 10.0f, 0.08f)// 8
 };
 
+const float WATER_COLOR[] = { 1.0f, 1.0f, 1.0f, 0.6f };
+const float SPLASH = 0.03f;
+
 /***********************
-* Lighting configuration
-***********************/
+ * Lighting configuration
+ ***********************/
 GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0f };
 GLfloat lightDiffuse1[] = { 0.8f, 0.8f, 0.8f, 0.0f };
 GLfloat lightPosition1[] = { 0.8f, 0.4f, -0.5f, 0.0f };
@@ -72,6 +75,16 @@ const float MOVE_FACTOR = 0.1f;
 const float ROTATE_FACTOR = 1.0f;
 const FVector3 CAMERA_POSITION(POOL_SIZE_X / 2.0f, 1.8f, POOL_SIZE_Z + 3.5f);
 const FVector3 CAMERA_ROTATION(-5.0f, 0.0f);
+
+/***********************
+ * Viewport and Window Configuration
+ ***********************/
+const double FIELD_OF_VIEW = 45.0;
+const double CLIP_NEAR = 1.0;
+const double CLIP_FAR = 100.0;
+const int WINDOW_WIDTH = 1000;
+const int WINDOW_HEIGHT = 600;
+
 
 /***********************
  * Objects in the scene
@@ -93,6 +106,7 @@ Skybox skybox;
 // The ground
 Ground ground;
 
+bool isFullScreen = false;
 
 void keyDown(unsigned char key, int x, int y) {
     switch (key) {
@@ -102,10 +116,19 @@ void keyDown(unsigned char key, int x, int y) {
         case 27:	//ESC
             exit(0);
             break;
+        case 'f':
+            if (!isFullScreen) {
+                glutFullScreen();
+                isFullScreen = true;
+            } else {
+                glutReshapeWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+                isFullScreen = false;
+            }
+            break;
         case 'r':
             camera.rotateX(ROTATE_FACTOR);
             break;
-        case 'f':
+        case 'v':
             camera.rotateX(-ROTATE_FACTOR);
             break;
         case 'a':
@@ -159,27 +182,24 @@ void spKeyDown(int key, int x, int y) {
 }
 
 void drawScene(void) {
-
-    // render the pool
     glEnable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
-    glPushMatrix();
-    glTranslatef(0.0f, POOL_HEIGHT, 0.0f);
-    pool.render();
-    glPopMatrix();
-
-    //Render the basin
-    basin.render();
-    
-    // render the ground
-    ground.render();
-    skybox.render();
-    glDisable(GL_TEXTURE_2D);
-
-    //Render the water in the air.
     glEnable(GL_BLEND);
+
+    // set up the scene
+    pool.render();
+    basin.render();
+    ground.render();
+
+    // sky
     glDisable(GL_LIGHTING);
-    glColor4f(0.8f, 0.8f, 0.8f, 0.8f);
+    skybox.render();    
+    glEnable(GL_LIGHTING);
+
+    // water in the air
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_LIGHTING);
+    glColor4fv(WATER_COLOR);
     fountain.render();
 
     glDisable(GL_BLEND);
@@ -196,22 +216,18 @@ void display(void) {
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     drawScene();
-    glFlush();			//Finish rendering
     glutSwapBuffers();
 }
 
 void reshape(int x, int y) {
-    if (y == 0 || x == 0) return;  //Nothing is visible then, so return
-    //Set a new projection matrix
+    if (y == 0 || x == 0) return;  // invisible
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //Angle of view:40 degrees
-    //Near clipping plane distance: 0.3
-    //Far clipping plane distance: 50.0
-    gluPerspective(40.0, (GLdouble)x / (GLdouble)y, 0.3, 50.0);
+    gluPerspective(FIELD_OF_VIEW, (GLdouble)x / (GLdouble)y,
+                   CLIP_NEAR, CLIP_FAR);
     glViewport(0, 0, x, y);  //Use the whole window for rendering
     glMatrixMode(GL_MODELVIEW);
-
 }
 
 void idle(void) {
@@ -225,67 +241,65 @@ void idle(void) {
 }
 
 int main(int argc, char **argv) {
-    //Initialize GLUT
+    // initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(1000, 600);
-    //Create a window with rendering context and everything else we need
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutCreateWindow("Fountain");
 
-    //Textures:
-    Texture waterTexture;  //the image does not contain a water texture, 
-    //but it is applied to the water
-    Texture rockTexture;
+    // textures
+    Texture pebbleTexture;
+    Texture basinTexture;
     Texture groundTexture;
-    Texture skyboxTextures[5];
+    Texture skyTextures[6];
 
-    //Load the textures:
-    waterTexture.load("resource/pebbles.bmp");
-    rockTexture.load("resource/wall.bmp");
+    pebbleTexture.load("resource/pebbles.bmp");
+    basinTexture.load("resource/wall.bmp");
     groundTexture.load("resource/grass.bmp");
 
-    skyboxTextures[SKY_FRONT].load("resource/skybox/front.bmp", GL_CLAMP_TO_EDGE);
-    skyboxTextures[SKY_RIGHT].load("resource/skybox/right.bmp", GL_CLAMP_TO_EDGE);
-    skyboxTextures[SKY_LEFT].load("resource/skybox/left.bmp", GL_CLAMP_TO_EDGE);
-    skyboxTextures[SKY_BACK].load("resource/skybox/back.bmp", GL_CLAMP_TO_EDGE);
-    skyboxTextures[SKY_UP].load("resource/skybox/up.bmp", GL_CLAMP_TO_EDGE);
-    skyboxTextures[SKY_DOWN].load("resource/skybox/down.bmp", GL_CLAMP_TO_EDGE);
+    skyTextures[SKY_FRONT].load("resource/skybox/front.bmp", GL_CLAMP_TO_EDGE);
+    skyTextures[SKY_RIGHT].load("resource/skybox/right.bmp", GL_CLAMP_TO_EDGE);
+    skyTextures[SKY_LEFT].load("resource/skybox/left.bmp", GL_CLAMP_TO_EDGE);
+    skyTextures[SKY_BACK].load("resource/skybox/back.bmp", GL_CLAMP_TO_EDGE);
+    skyTextures[SKY_UP].load("resource/skybox/up.bmp", GL_CLAMP_TO_EDGE);
+    skyTextures[SKY_DOWN].load("resource/skybox/down.bmp", GL_CLAMP_TO_EDGE);
 
+    // initialize the scene
     skybox.initialize(-SKY_BOX_SIZE, SKY_BOX_SIZE,
                       -SKY_BOX_SIZE, SKY_BOX_SIZE,
-                      -SKY_BOX_SIZE, SKY_BOX_SIZE, skyboxTextures);
+                      -SKY_BOX_SIZE, SKY_BOX_SIZE, skyTextures);
 
-    pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS,
+    pool.initialize(NUM_X_OSCILLATORS, NUM_Z_OSCILLATORS, POOL_HEIGHT,
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
-                    DAMPING, POOL_TEX_REPEAT_X, POOL_TEX_REPEAT_Z,
-                    &waterTexture);
+                    DAMPING, SPLASH, POOL_TEX_REPEAT_X, POOL_TEX_REPEAT_Z,
+                    &pebbleTexture);
 
     fountain.initialize(initializers[0]);
 
     basin.initialize(BASIN_BORDER_HEIGHT + POOL_HEIGHT, BASIN_BORDER_WIDTH,
-                     POOL_SIZE_X, POOL_SIZE_Z, &rockTexture);
+                     POOL_SIZE_X, POOL_SIZE_Z, &basinTexture);
 
     ground.initialize(-GROUND_SIZE, GROUND_SIZE,
                       -GROUND_SIZE, GROUND_SIZE, &groundTexture);
 
     // place the fountain in the center of the pool
-    fountain.center = FVector3(POOL_SIZE_X / 2.0f, POOL_HEIGHT, POOL_SIZE_Z / 2.0f);
+    fountain.center = FVector3(POOL_SIZE_X / 2.0f, POOL_HEIGHT,
+                               POOL_SIZE_Z / 2.0f);
 
-    //initialize camera: 
-    camera.move(FVector3(POOL_SIZE_X / 2.0f, 1.8f, POOL_SIZE_Z + 3.5f));
-    camera.rotateY(0);
-    camera.rotateX(-5);
+    // initialize camera: 
+    camera.move(CAMERA_POSITION);
+    camera.rotate(CAMERA_ROTATION);
 
-    //Enable the vertex array functionality:
+    // enable vertex array
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    //Switch on solid rendering:
+    // solid rendering
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
 
-    //Initialize lighting:
+    // lighting
     glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
     glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
@@ -300,35 +314,36 @@ int main(int argc, char **argv) {
 
     glEnable(GL_COLOR_MATERIAL);
 
-    //Some general settings:
+    // settings
     glClearColor(0.0, 0.0, 0.0, 0.0);
-    glFrontFace(GL_CCW);   //Tell OGL which orientation shall be the front face
+    glFrontFace(GL_CCW);   // orientation should be the front face
     glShadeModel(GL_SMOOTH);
 
-    //Initialize blending:
+    // blending
     glEnable(GL_BLEND);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_POLYGON_SMOOTH);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //initialize generation of random numbers:
+    // seed
     srand((unsigned)time(NULL));
 
     printf("1 - 7:\tChange the shape of the fountain\n");
     printf("up, down:\tMove camera forward / backword\n");
     printf("left, right:\tTurn camera right / left\n");
-    printf("r, f:\tTurn camera up / down\n");
+    printf("r, v:\tTurn camera up / down\n");
     printf("w, s:\tMove camera up / down\n");
     printf("a, d:\tMove camera left / right\n");
     printf("ESC:\texit\n");
 
-    //Assign the two used Msg-routines
+    // register callbacks
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyDown);
     glutSpecialFunc(spKeyDown);
     glutIdleFunc(idle);
-    //Let GLUT get the msgs
+
+    // start
     glutMainLoop();
 
     return 0;

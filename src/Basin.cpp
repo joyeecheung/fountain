@@ -12,7 +12,7 @@ void Basin::initialize(const float height, const float borderWidth,
 
     this->listIdx = glGenLists(1);
     glNewList(listIdx, GL_COMPILE);
-
+    glPushMatrix();
     texture->bind();
     glBegin(GL_QUADS);
 
@@ -150,6 +150,7 @@ void Basin::initialize(const float height, const float borderWidth,
     glVertex3f(innerSizeX + borderWidth, 0.0f, innerSizeZ + borderWidth);
 
     glEnd();
+    glPopMatrix();
     glEndList();
 }
 
