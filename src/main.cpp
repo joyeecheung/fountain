@@ -211,6 +211,46 @@ void drawScene(void) {
     glDisable(GL_BLEND);
 }
 
+void renderBitmapString(float x, float y, float z,
+                        void *font, const char *string) {
+    const char *c;
+    glRasterPos3f(x, y, z);
+    for (c = string; *c != '\0'; c++) {
+        glutBitmapCharacter(font, *c);
+    }
+}
+
+int lastTime = 0;
+int cframe = 0;
+char pixelstring[30];
+void countFrames(void) {
+    int thisTime = glutGet(GLUT_ELAPSED_TIME);
+    cframe++;
+    sprintf(pixelstring, "fps: %4.2f",
+            cframe * 1000.0 / (thisTime - lastTime));
+    lastTime = thisTime;
+    cframe = 0;
+
+    // draw status text
+    glPushMatrix();
+    glLoadIdentity();
+    glDisable(GL_LIGHTING);
+    glColor4f(1.0, 1.0, 1.0, 1.0);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, 200, 0, 200);
+    glMatrixMode(GL_MODELVIEW);
+
+    // render the string
+    renderBitmapString(10, 10, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, pixelstring);
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+}
+
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -222,6 +262,7 @@ void display(void) {
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     drawScene();
+    countFrames();
     glutSwapBuffers();
 }
 
@@ -235,6 +276,7 @@ void reshape(int x, int y) {
     glViewport(0, 0, x, y);
     glMatrixMode(GL_MODELVIEW);
 }
+
 
 void idle(void) {
     // update the fountain and the pool
