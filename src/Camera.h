@@ -4,8 +4,9 @@
 #include <gl\glut.h>
 #include "FVector.h"
 
-/* Note: angles are in [0, 90]
- */
+/*****
+  Note: angles are all in [0, 90]
+ ****/
 class Camera {
 public:
     Camera() : position(0.0f, 0.0f, 0.0f),

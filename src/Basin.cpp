@@ -16,9 +16,9 @@ void Basin::initialize(const float height, const float borderWidth,
     texture->bind();
     glBegin(GL_QUADS);
 
-    //******************
-    // top surface
-    //******************
+    /******************
+     * top surface
+     ******************/
     glNormal3f(0.0f, 1.0f, 0.0f);
 
     glTexCoord2f(texBorder, texBorder);
@@ -57,9 +57,9 @@ void Basin::initialize(const float height, const float borderWidth,
     glTexCoord2f(1.0f, 1.0f);
     glVertex3f(innerSizeX + borderWidth, height, innerSizeZ + borderWidth);
 
-    //******************
-    // front sides
-    //******************
+    /******************
+     * front sides
+     ******************/
     glNormal3f(0.0f, 0.0f, 1.0f);
 
     glTexCoord2f(texBorder, texBorder);
@@ -80,9 +80,9 @@ void Basin::initialize(const float height, const float borderWidth,
     glTexCoord2f(0.0f, 1.0f);
     glVertex3f(-borderWidth, 0.0f, innerSizeZ + borderWidth);
 
-    //******************
-    // back sides
-    //******************
+    /******************
+    * back sides
+    ******************/
     glNormal3f(0.0f, 0.0f, -1.0f);
 
     glTexCoord2f(texBorder, texBorder);
@@ -103,9 +103,9 @@ void Basin::initialize(const float height, const float borderWidth,
     glTexCoord2f(0.0f, 1.0f);
     glVertex3f(-borderWidth, 0.0f, -borderWidth);
 
-    //******************
-    // left sides
-    //******************
+    /******************
+    *  left sides
+    ******************/
     glNormal3f(-1.0f, 0.0f, 0.0f);
 
     glTexCoord2f(1.0f - texBorder, texBorder);
@@ -126,9 +126,9 @@ void Basin::initialize(const float height, const float borderWidth,
     glTexCoord2f(0.0f, texBorder);
     glVertex3f(-borderWidth, 0.0f, -borderWidth);
 
-    //******************
-    // right sides
-    //******************
+    /******************
+    *  right sides
+    ******************/
     glNormal3f(1.0f, 0.0f, 0.0f);
 
     glTexCoord2f(1.0f - texBorder, 0.0f);

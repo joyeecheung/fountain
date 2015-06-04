@@ -6,11 +6,11 @@ GLfloat FVector3::length() const {
 }
 
 FVector3 FVector3::normalize() const {
-    float l = length();
-    if (fabs(l - 0.0f) < 1e-6)
+    float len = length();
+    if (fabs(len - 0.0f) < 1e-6)
         return FVector3(0.0f, 0.0f, 0.0f);
     else
-        return FVector3(x / l, y / l, z / l);
+        return FVector3(x / len, y / len, z / len);
 }
 
 FVector3 FVector3::cross(const FVector3 &v) const {
