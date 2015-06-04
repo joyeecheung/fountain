@@ -9,3 +9,5 @@ Debug
 *.pdb
 *.tlog
 *.idc
+*.make
+Makefile
