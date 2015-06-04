@@ -1,4 +1,4 @@
-#include "Skybox.h"
+#include "SkyBox.h"
 
 void Skybox::initialize(float minX, float maxX,
                         float minY, float maxY,

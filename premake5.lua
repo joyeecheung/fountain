@@ -7,18 +7,21 @@ solution "Fountain"
       kind "ConsoleApp"
       language "C++"
       files { "src/*.cpp" }
-      libdirs { "lib" }
-      includedirs { "include", "src" }
       buildoptions "-std=c++11"
 
       configuration { "windows" }
+        libdirs { "lib" }
+        includedirs { "include", "src" }
         links { "FreeGLUT", "glu32", "opengl32", "FreeImage"}
 
       configuration { "macosx" }
+        includedirs { "src" }
         linkoptions { "-framework Carbon -framework OpenGL -framework GLUT" }
+        links { "FreeImage" }
 
       configuration { "not windows", "not macosx" }
-        links { "X11", "GL", "GLU", "GLUT" }
+        includedirs { "src" }
+        links { "X11", "GL", "GLU", "GLUT", "FreeImage" }
 
       configuration "Debug"
          defines { "DEBUG" } -- -DDEBUG
