@@ -27,25 +27,39 @@ Under HiDPI, it looks like this:
 
 ## Techniques Used
 
-1. First person camera
-2. Texture
-3. Lighting
-4. Sky box
+1. First person camera(see "Operation" below for information about the keyboard controls)
+2. Texture(basin, ground, skybox)
+3. Lighting(two-side)
+4. Skybox
 5. Simulated water(particles)
-6. Simulated waves(Oscillators)
-7. Display list
-8. Fonts and text
+6. Simulated waves(oscillators)
+7. Display list(skybox, ground, fountain basin)
+8. Fonts and text(there is a frame rate counter at the bottom left)
 
 ### Explanation about the water and the waves
 
-* The waters are just semi-transparent particles(points) moving along calculated parabolas.
+* The water is just semi-transparent particles(points) moving along calculated parabolas.
 * The waves are simulated by oscillators. They change the vertices of the pool and update the normals accordingly to create ripples. The position of these oscillatiors are affected by their neighbors, and the oscillators on the edge will always have a constant `y`. Therefore the waves will bounce back when they reach the edge.
 
-Look closer and take a screenshot, then you will know what is going on.
+Look closer and take a screenshot, then you will know what is going on. For more information, checkout `Fountain.cpp` and `Pool.cpp` and read the comments.
 
 ![](screenshot/closer.jpg)
 
 ![](screenshot/closer2.jpg)
+
+
+### Shapes
+
+![](screenshot/shapes/1.jpg)
+![](screenshot/shapes/2.jpg)
+![](screenshot/shapes/3.jpg)
+![](screenshot/shapes/4.jpg)
+![](screenshot/shapes/5.jpg)
+![](screenshot/shapes/6.jpg)
+![](screenshot/shapes/7.jpg)
+![](screenshot/shapes/8.jpg)
+
+To lower down the burden on the CPU, the preset shapes are rather simple(with not many rays per level or drops per ray). If you want to see some fancier shapes, you can go tweak the initializers in `main.cpp`.
 
 ## Operations
 
