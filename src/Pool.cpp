@@ -88,7 +88,7 @@ void Pool::splashOscillator(int posX, int posZ) {
     // this is needed by fountains with drops out of range
     if ((posX >= 0) && (posX < oNumX) && (posZ >= 0) && (posZ < oNumZ)) {
         int idx = posX + posZ * oNumX;
-        if (oscillators[idx].y > -0.15)  // TODO: move out this hard threshold
+        if (oscillators[idx].y > -height)
             oscillators[idx].y += splash;
     }
 }

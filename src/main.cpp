@@ -26,12 +26,12 @@ const float GROUND_SIZE = 30.0f;
 const int OSCILLATORS_NUM_X = 110;
 const int OSCILLATORS_NUM_Z = 110;
 const float OSCILLATOR_DISTANCE = 0.04f;
-const float OSCILLATOR_WEIGHT = 0.00015f;
-const float OSCILLATOR_SPLASH = -0.03f;
+const float OSCILLATOR_WEIGHT = 0.0002f;
+const float OSCILLATOR_SPLASH = -0.015f;
 const float OSCILLATOR_DAMPING = 0.005f;
 const float POOL_HEIGHT = 0.3f;
-const float POOL_TEX_REPEAT_X = 2.0f;
-const float POOL_TEX_REPEAT_Z = 2.0f;
+const float POOL_TEX_REPEAT_X = 3.0f;
+const float POOL_TEX_REPEAT_Z = 3.0f;
 
 /***********************
  * Basin Configuration
@@ -57,7 +57,8 @@ FInitializer initializers[] = {
 };
 
 const float WATER_COLOR[] = { 0.9f, 0.9f, 0.9f, 0.4f };
-const float TIME_DELTA = 0.001f;
+const float TIME_DELTA = 0.002f;
+const int FPS = 120;
 
 /***********************
  * Lighting configuration
@@ -224,15 +225,10 @@ void renderBitmapString(float x, float y, float z,
 }
 
 int lastTime = 0;
-int cframe = 0;
-char pixelstring[30];
-void countFrames(void) {
-    int thisTime = glutGet(GLUT_ELAPSED_TIME);
-    cframe++;
-    sprintf(pixelstring, "fps: %4.2f",
-            cframe * 1000.0 / (thisTime - lastTime));
-    lastTime = thisTime;
-    cframe = 0;
+int thisTime = 0;
+void countFrames() {
+    char pixelstring[30];
+    sprintf(pixelstring, "fps: %4.2f", 1000.0 / (thisTime - lastTime));
 
     // draw status text
     glPushMatrix();
@@ -260,8 +256,8 @@ void display(void) {
 
     camera.render();
 
-    glLightfv(GL_LIGHT0, GL_POSITION, LIGHT_POSITION_1);
-    glLightfv(GL_LIGHT0, GL_POSITION, LIGHT_POSITION_2);
+    glLightfv(GL_LIGHT1, GL_POSITION, LIGHT_POSITION_1);
+    glLightfv(GL_LIGHT2, GL_POSITION, LIGHT_POSITION_2);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     drawScene();
@@ -269,6 +265,18 @@ void display(void) {
     glutSwapBuffers();
 }
 
+void idle(void) {
+    thisTime = glutGet(GLUT_ELAPSED_TIME);
+    if (thisTime - lastTime > 1000 / FPS) {
+        // update the fountain and the pool
+        fountain.update(TIME_DELTA, pool);
+        pool.update(TIME_DELTA);
+
+        //render the scene:
+        display();
+        lastTime = thisTime;
+    }
+}
 void reshape(int x, int y) {
     if (y == 0 || x == 0) return;  // invisible
 
@@ -278,16 +286,6 @@ void reshape(int x, int y) {
                    CLIP_NEAR, CLIP_FAR);
     glViewport(0, 0, x, y);
     glMatrixMode(GL_MODELVIEW);
-}
-
-
-void idle(void) {
-    // update the fountain and the pool
-    fountain.update(TIME_DELTA, pool);
-    pool.update(TIME_DELTA);
-
-    //render the scene:
-    display();
 }
 
 int main(int argc, char **argv) {
