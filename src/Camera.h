@@ -9,10 +9,12 @@
  ****/
 class Camera {
 public:
-    Camera() : position(0.0f, 0.0f, 0.0f),
-               direction(0.0f, 0.0f, -1.0f),
-               directionChanged(false),
-               rotation(0.0f, 0.0f, 0.0f) {}
+    Camera() {
+        position.set(0.0f, 0.0f, 0.0f);
+        direction.set(0.0f, 0.0f, -1.0f);
+        directionChanged = false;
+        rotation.set(0.0f, 0.0f, 0.0f);
+    }
     /* Executes glRotate and glTranslate.
      * Should be called after calling glLoadIdentity. */
     void render(void) const;

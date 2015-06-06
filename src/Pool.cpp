@@ -154,23 +154,23 @@ void Pool::update(float deltaTime) {
             // calculate left-to-right direction vector
             ip1 = i > 0 ? ileft : idx;
             ip2 = i < oNumX - 1 ? iright : idx;
-            p1 = FVector3(oscillators[ip1].x,
-                          oscillators[ip1].y,
-                          oscillators[ip1].z);
-            p2 = FVector3(oscillators[ip2].x,
-                          oscillators[ip2].y,
-                          oscillators[ip2].z);
+            p1.set(oscillators[ip1].x,
+                   oscillators[ip1].y,
+                   oscillators[ip1].z);
+            p2.set(oscillators[ip2].x,
+                   oscillators[ip2].y,
+                   oscillators[ip2].z);
             u = p2 - p1;
 
             // calculate upper-to-lower direction vector
             ip1 = j > 0 ? idown : idx;
             ip2 = j < oNumZ - 1 ? iup : idx;
-            p1 = FVector3(oscillators[ip1].x,
-                          oscillators[ip1].y,
-                          oscillators[ip1].z);
-            p2 = FVector3(oscillators[ip2].x,
-                          oscillators[ip2].y,
-                          oscillators[ip2].z);
+            p1.set(oscillators[ip1].x,
+                   oscillators[ip1].y,
+                   oscillators[ip1].z);
+            p2.set(oscillators[ip2].x,
+                   oscillators[ip2].y,
+                   oscillators[ip2].z);
             v = p2 - p1;
 
             // cross product to get the orthogonal vector
@@ -188,8 +188,8 @@ void Pool::update(float deltaTime) {
 void Pool::render() const {
     // set up pointers
     glVertexPointer(3, GL_FLOAT, sizeof(Oscillator), oscillators);
-    glTexCoordPointer(2, GL_FLOAT, sizeof(Oscillator), &oscillators[0].texX);
-    glNormalPointer(GL_FLOAT, sizeof(Oscillator), &oscillators[0].nx);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Oscillator), &(oscillators[0].texX));
+    glNormalPointer(GL_FLOAT, sizeof(Oscillator), &(oscillators[0].nx));
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);

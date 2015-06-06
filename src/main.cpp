@@ -1,5 +1,5 @@
 #include <GL/glut.h>
-
+#include <type_traits>
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
@@ -80,9 +80,12 @@ const float LIGHT_POSITION_2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
  ***********************/
 const float MOVE_FACTOR = 0.1f;
 const float ROTATE_FACTOR = 1.0f;
-const FVector3 CAMERA_POSITION(BASIN_INNER_X / 2.0f, 1.8f,
-                               BASIN_INNER_Z + 3.5f);
-const FVector3 CAMERA_ROTATION(-5.0f, 0.0f);
+const float CAMERA_POSITION[] = {
+    BASIN_INNER_X / 2.0f, 1.8f, BASIN_INNER_Z + 3.5f
+};
+const float CAMERA_ROTATION[] = {
+    -5.0f, 0.0f, 0.0f
+};
 
 /***********************
  * Viewport and Window Configuration
@@ -288,6 +291,8 @@ void idle(void) {
 }
 
 int main(int argc, char **argv) {
+    static_assert(std::is_pod<FVector3>::value, "FVector must be a POD!");
+    static_assert(std::is_pod<Oscillator>::value, "Oscillator must be a POD!");
     // initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -331,12 +336,14 @@ int main(int argc, char **argv) {
                       -GROUND_SIZE, GROUND_SIZE, &groundTexture);
 
     // place the fountain in the center of the pool
-    fountain.center = FVector3(BASIN_INNER_X / 2.0f, POOL_HEIGHT,
-                               BASIN_INNER_Z / 2.0f);
+    fountain.center.set(BASIN_INNER_X / 2.0f, POOL_HEIGHT, BASIN_INNER_Z / 2.0f);
 
     // initialize camera:
-    camera.move(CAMERA_POSITION);
-    camera.rotate(CAMERA_ROTATION);
+    FVector3 cposition, crotation;
+    cposition.set(CAMERA_POSITION[0], CAMERA_POSITION[1], CAMERA_POSITION[2]);
+    camera.move(cposition);
+    crotation.set(CAMERA_ROTATION[0], CAMERA_ROTATION[1], CAMERA_ROTATION[2]);
+    camera.rotate(crotation);
 
     // enable vertex array
     glEnableClientState(GL_VERTEX_ARRAY);

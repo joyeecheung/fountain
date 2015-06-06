@@ -6,10 +6,6 @@
 
 class FVector3 {
 public:
-    FVector3(float x = 0.0, float y = 0.0, float z = 0.0) {
-        set(x, y, z);
-    }
-
     float length() const;
     FVector3 normalize() const;
 
@@ -21,7 +17,6 @@ public:
     FVector3 operator/ (const float r) const;
 
     void addBy(const FVector3 &other);  // add another vector to it
-    FVector3 & operator= (const FVector3 &other);
     void set(float x = 0.0, float y = 0.0, float z = 0.0) {
         this->x = x;
         this->y = y;

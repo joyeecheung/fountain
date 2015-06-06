@@ -7,24 +7,32 @@ float FVector3::length() const {
 
 FVector3 FVector3::normalize() const {
     float len = length();
+    FVector3 result;
     if (fabs(len - 0.0f) < 1e-6)
-        return FVector3(0.0f, 0.0f, 0.0f);
+        result.set(0.0f, 0.0f, 0.0f);
     else
-        return FVector3(x / len, y / len, z / len);
+        result.set(x / len, y / len, z / len);
+    return result;
 }
 
 FVector3 FVector3::cross(const FVector3 &v) const {
-    return FVector3(y * v.z - z * v.y,
-                    z * v.x - x * v.z,
-                    x * v.y - y * v.x);
+    FVector3 result;
+    result.set(y * v.z - z * v.y,
+               z * v.x - x * v.z,
+               x * v.y - y * v.x);
+    return result;
 }
 
 FVector3 FVector3::operator+ (const FVector3 &v) const {
-    return FVector3(x + v.x, y + v.y, z + v.z);
+    FVector3 result;
+    result.set(x + v.x, y + v.y, z + v.z);
+    return result;
 }
 
 FVector3 FVector3::operator- (const FVector3 &v) const {
-    return FVector3(x - v.x, y - v.y, z - v.z);
+    FVector3 result;
+    result.set(x - v.x, y - v.y, z - v.z);
+    return result;
 }
 
 float FVector3::operator* (const FVector3 &v) const {
@@ -32,18 +40,15 @@ float FVector3::operator* (const FVector3 &v) const {
 }
 
 FVector3 FVector3::operator* (float r) const {
-    return FVector3(x * r, y * r, z * r);
+    FVector3 result;
+    result.set(x * r, y * r, z * r);
+    return result;
 }
 
 FVector3 FVector3::operator/ (float r) const {
-    return FVector3(x / r, y / r, z / r);
-}
-
-FVector3 & FVector3::operator= (const FVector3 &other) {
-    x = other.x;
-    y = other.y;
-    z = other.z;
-    return *this;
+    FVector3 result;
+    result.set(x / r, y / r, z / r);
+    return result;
 }
 
 void FVector3::addBy(const FVector3 &other) {
