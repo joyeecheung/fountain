@@ -1,7 +1,10 @@
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
+#include <memory>
+#include <vector>
 #include <GL/glut.h>
+
 #include "Texture.h"
 
 // sky box face indices
@@ -11,6 +14,7 @@
 #define SKY_BACK 3
 #define SKY_UP 4
 #define SKY_DOWN 5
+#define SKY_BOX_FACES 6
 
 class Skybox {
 public:
@@ -18,13 +22,12 @@ public:
     void initialize(float minX, float maxX,
                     float minY, float maxY,
                     float minZ, float maxZ,
-                    Texture * textures);
+                    std::unique_ptr<Texture[]> textures);
     void render() const;
 private:
     float minX, maxX;  // dimension on x-axis
     float minY, maxY;  // dimension on y-axis
     float minZ, maxZ;  // dimension on z-axis
-    Texture *textures;  // skybox textures
     int listIdx;  // index to the display list
 };
 

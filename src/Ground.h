@@ -1,19 +1,20 @@
 #ifndef GROUND_H
 #define GROUND_H
 
+#include <memory>
 #include <GL/glut.h>
+
 #include "Texture.h"
 
 class Ground {
 public:
     Ground() {}
     void initialize(float minX, float maxX,
-                    float minZ, float maxZ, Texture *groundTexture);
+                    float minZ, float maxZ, std::unique_ptr<Texture> groundTexture);
     void render() const;
 private:
     float minX, maxX;
     float minZ, maxZ;
-    Texture *groundTexture;
     int listIdx;  // index to the display list
 };
 

@@ -2,13 +2,12 @@
 
 void Ground::initialize(float minX, float maxX,
                         float minZ, float maxZ,
-                        Texture *groundTexture) {
+                        std::unique_ptr<Texture> groundTexture) {
     // initialize members
     this->minX = minX;
     this->maxX = maxX;
     this->minZ = minZ;
     this->maxZ = maxZ;
-    this->groundTexture = groundTexture;
 
     // set up display list
     this->listIdx = glGenLists(1);

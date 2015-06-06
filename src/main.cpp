@@ -1,4 +1,5 @@
 #include <GL/glut.h>
+#include <memory>
 #include <type_traits>
 #include <cmath>
 #include <ctime>
@@ -13,6 +14,11 @@
 #include "Ground.h"
 #include "Pool.h"
 #include "Fountain.h"
+
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
 /***********************
  * Sky and ground Configuration
@@ -298,14 +304,14 @@ int main(int argc, char **argv) {
     glutCreateWindow("Fountain");
 
     // textures
-    Texture pebbleTexture;
-    Texture basinTexture;
-    Texture groundTexture;
-    Texture skyTextures[6];
+    std::unique_ptr<Texture> pebbleTexture(new Texture);
+    std::unique_ptr<Texture> basinTexture(new Texture);
+    std::unique_ptr<Texture> groundTexture(new Texture);
+    std::unique_ptr<Texture[]> skyTextures(new Texture[SKY_BOX_FACES]);
 
-    pebbleTexture.load("resource/pebbles.bmp");
-    basinTexture.load("resource/wall.bmp");
-    groundTexture.load("resource/grass.bmp");
+    pebbleTexture->load("resource/pebbles.bmp");
+    basinTexture->load("resource/wall.bmp");
+    groundTexture->load("resource/grass.bmp");
 
     skyTextures[SKY_FRONT].load("resource/skybox/front.bmp", GL_CLAMP_TO_EDGE);
     skyTextures[SKY_RIGHT].load("resource/skybox/right.bmp", GL_CLAMP_TO_EDGE);
@@ -317,21 +323,21 @@ int main(int argc, char **argv) {
     // initialize the scene
     skybox.initialize(-SKY_BOX_SIZE, SKY_BOX_SIZE,
                       -SKY_BOX_SIZE, SKY_BOX_SIZE,
-                      -SKY_BOX_SIZE, SKY_BOX_SIZE, skyTextures);
+                      -SKY_BOX_SIZE, SKY_BOX_SIZE, std::move(skyTextures));
 
     pool.initialize(OSCILLATORS_NUM_X, OSCILLATORS_NUM_Z, POOL_HEIGHT,
                     OSCILLATOR_DISTANCE, OSCILLATOR_WEIGHT,
                     OSCILLATOR_DAMPING, OSCILLATOR_SPLASH,
                     POOL_TEX_REPEAT_X, POOL_TEX_REPEAT_Z,
-                    &pebbleTexture);
+                    std::move(pebbleTexture));
 
     fountain.initialize(initializers[0]);
 
     basin.initialize(BASIN_BORDER_HEIGHT + POOL_HEIGHT, BASIN_BORDER_WIDTH,
-                     BASIN_INNER_X, BASIN_INNER_Z, &basinTexture);
+                     BASIN_INNER_X, BASIN_INNER_Z, std::move(basinTexture));
 
     ground.initialize(-GROUND_SIZE, GROUND_SIZE,
-                      -GROUND_SIZE, GROUND_SIZE, &groundTexture);
+                      -GROUND_SIZE, GROUND_SIZE, std::move(groundTexture));
 
     // place the fountain in the center of the pool
     fountain.center.set(BASIN_INNER_X / 2.0f, POOL_HEIGHT, BASIN_INNER_Z / 2.0f);

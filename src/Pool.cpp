@@ -6,7 +6,7 @@ void Pool::initialize(int oNumX, int oNumZ, float height,
                       float oDistance, float oWeight,
                       float damping, float splash,
                       float texRepeatX, float texRepeatZ,
-                      Texture * floorTexture) {
+                      std::unique_ptr<Texture> floorTexture) {
     // initializes the members
     this->oNumX = oNumX;
     this->oNumZ = oNumZ;
@@ -16,7 +16,7 @@ void Pool::initialize(int oNumX, int oNumZ, float height,
     this->oWeight = oWeight;
     this->damping = damping;
     this->splash = splash;
-    this->floorTexture = floorTexture;
+    this->floorTexture = std::move(floorTexture);
 
     std::vector <int> idxVector; // temporary vector for indices
 

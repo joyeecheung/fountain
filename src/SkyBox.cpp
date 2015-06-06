@@ -3,7 +3,7 @@
 void Skybox::initialize(float minX, float maxX,
                         float minY, float maxY,
                         float minZ, float maxZ,
-                        Texture *textures) {
+                        std::unique_ptr<Texture[]> textures) {
     // initialize members
     this->minX = minX;
     this->maxX = maxX;
