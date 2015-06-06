@@ -1,6 +1,8 @@
 # Fountain
 
-Zhang Qiuyi, 12330402
+* Zhang Qiuyi, 12330402
+* Kuang Jiahao, 12330152
+* Li Jianhua, 12330165
 
 ## Dependencies
 
@@ -80,6 +82,7 @@ To lower down the burden on the CPU, the preset shapes are rather simple(with no
   - lib  // static libraries
   - resource  // e.g. textures
   - src  // source code
+  - screenshot // screenshots
 
   // dynamic library for the prebuilt executable
   - freeglut.dll
@@ -136,9 +139,3 @@ $ sudo apt-get install libfreeimage3 libfreeimage-dev
 ```
 
 Download premake5 from [here](https://premake.github.io/download.html#v5), extract the executable in the archive(e.g. `premake5`), and put the path to the executable in your `PATH` environment variables(e.g. extract the file to `/usr/local/bin` with root permission so you don't have to touch `PATH`). To generate the project files for make, simply run `premake5 gmake`, then run `make` to build it. The executable will appear under the project directory, named `Fountain`.
-
-## About
-
-* Author: Joyee Cheung
-* [Email](mailto://joyeec9h3@gmail.com)
-* [GitHub Repo](https://github.com/joyeecheung/fountain)

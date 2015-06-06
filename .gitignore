@@ -11,3 +11,5 @@ Debug
 *.idc
 *.make
 Makefile
+*.pdf
+*.html
