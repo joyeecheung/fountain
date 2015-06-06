@@ -87,7 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Basin.h" />
-    <ClInclude Include="src\bitmap_image.hpp" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Fountain.h" />
     <ClInclude Include="src\FVector.h" />

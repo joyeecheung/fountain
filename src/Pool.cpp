@@ -18,10 +18,8 @@ void Pool::initialize(int oNumX, int oNumZ, float height,
     this->splash = splash;
     this->floorTexture = std::move(floorTexture);
 
-    std::vector <int> idxVector; // temporary vector for indices
-
-    if (oscillators != nullptr) delete [] oscillators;
-    oscillators = new Oscillator[oNum];
+    oscillators.clear();
+    oscillators.resize(oNum);
 
     for (int i = 0; i < oNumX; i++) {
         for (int j = 0; j < oNumZ; j++) {
@@ -45,26 +43,19 @@ void Pool::initialize(int oNumX, int oNumZ, float height,
 
             // create a peek for it. that's two triangles
             if ((i < oNumX - 1) && (j < oNumZ - 1)) {
-                idxVector.push_back(i + j * oNumX);
-                idxVector.push_back((i + 1) + j * oNumX);
-                idxVector.push_back((i + 1) + (j + 1) * oNumX);
+                indices.push_back(i + j * oNumX);
+                indices.push_back((i + 1) + j * oNumX);
+                indices.push_back((i + 1) + (j + 1) * oNumX);
 
-                idxVector.push_back(i + j * oNumX);
-                idxVector.push_back((i + 1) + (j + 1) * oNumX);
-                idxVector.push_back(i + (j + 1) * oNumX);
+                indices.push_back(i + j * oNumX);
+                indices.push_back((i + 1) + (j + 1) * oNumX);
+                indices.push_back(i + (j + 1) * oNumX);
             }
 
         }
     }
 
-    // copy the indices
-    if (indices != nullptr) delete [] indices;
-    indices = new int[idxVector.size()];
-    for (size_t i = 0; i < idxVector.size(); i++) {
-        indices[i] = idxVector[i];
-    }
-
-    indicesNum = idxVector.size();
+    indicesNum = indices.size();
 }
 
 void Pool::reset() {
@@ -187,9 +178,9 @@ void Pool::update(float deltaTime) {
 
 void Pool::render() const {
     // set up pointers
-    glVertexPointer(3, GL_FLOAT, sizeof(Oscillator), oscillators);
-    glTexCoordPointer(2, GL_FLOAT, sizeof(Oscillator), &(oscillators[0].texX));
-    glNormalPointer(GL_FLOAT, sizeof(Oscillator), &(oscillators[0].nx));
+    glVertexPointer(3, GL_FLOAT, sizeof(Oscillator), oscillators.data());
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Oscillator), &(oscillators.data()[0].texX));
+    glNormalPointer(GL_FLOAT, sizeof(Oscillator), &(oscillators.data()[0].nx));
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -201,6 +192,6 @@ void Pool::render() const {
     floorTexture->bind();
     // fill it. NOTE: this will affect the whole scene!!!
     glColor4f(1.0, 1.0, 1.0, 1.0);
-    glDrawElements(GL_TRIANGLES, indicesNum,  GL_UNSIGNED_INT, indices);
+    glDrawElements(GL_TRIANGLES, indicesNum,  GL_UNSIGNED_INT, indices.data());
     glPopMatrix();
 }

@@ -2,6 +2,7 @@
 #define POOL_H
 
 #include <memory>
+#include <vector>
 #include <GL/glut.h>
 
 #include "FVector.h"
@@ -21,13 +22,12 @@ class Pool {
 public:
     /*************** constructors  *************/
     // default
-    Pool() : oscillators(nullptr), indices(nullptr) {}
+    Pool() {}
     // explicit arguments
     Pool(int oNumX, int oNumZ, float height,
          float oDistance, float oWeight, float damping, float splash,
          float texRepeatX, float texRepeatZ,
-         std::unique_ptr<Texture> floorTexture)
-        : oscillators(nullptr), indices(nullptr) {
+         std::unique_ptr<Texture> floorTexture) {
         initialize(oNumX, oNumZ, height,
                    oDistance, oWeight, damping, splash,
                    texRepeatX, texRepeatZ,
@@ -56,13 +56,9 @@ public:
     void update(float deltaTime);
     void reset();
 
-    ~Pool() {
-        delete [] oscillators;
-        delete [] indices;
-    }
 private:
-    Oscillator * oscillators;  // oscillators for simulating the waves
-    int *indices;  // indices for drawing
+    std::vector<Oscillator> oscillators;  // oscillators for simulating the waves
+    std::vector<int> indices;  // indices for drawing
     std::unique_ptr<Texture> floorTexture;  // texture for the floor of the pool
 
     float oDistance; // distance between oscillators

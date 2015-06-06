@@ -53,10 +53,10 @@ void Fountain::initialize(int levels, int raysPerStep, int dropsPerRay, float dr
     this->numDrops = levels * raysPerStep * dropsPerRay;
     this->dropSize = dropSize;
 
-    if (this->drops != nullptr) delete[] this->drops;
-    if (this->dropPositions != nullptr) delete[] this->dropPositions;
-    this->drops = new Drop[numDrops];
-    this->dropPositions = new FVector3[numDrops];
+    this->drops.clear();
+    this->dropPositions.clear();
+    this->drops.resize(numDrops);
+    this->dropPositions.resize(numDrops);
 
     float randAcc; // acceleration changed randomly
     float timeElapsed;  // initial elapsed time for each drop
@@ -114,7 +114,7 @@ void Fountain::render() const {
 
     // draw the drops
     glPointSize(dropSize);
-    glVertexPointer(3, GL_FLOAT, 0, dropPositions);
+    glVertexPointer(3, GL_FLOAT, 0, dropPositions.data());
 
     // move the fountain to the center of the pool
     glTranslatef(center.x, center.y, center.z);

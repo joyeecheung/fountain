@@ -1,6 +1,7 @@
 #ifndef FOUNTAIN_H
 #define FOUNTAIN_H
 
+#include <vector>
 #include "FVector.h"
 #include "Pool.h"
 
@@ -48,12 +49,11 @@ class Fountain {
 public:
     /*************** constructors  *************/
     // default
-    Fountain() : dropPositions(nullptr), drops(nullptr) {}
+    Fountain() {}
     // explicit arguments
     Fountain(int levels, int raysPerStep, int dropsPerRay,
              float dropSize, float angleMin, float angleMax,
-             float randomAngle, float acceleration)
-        : dropPositions(nullptr), drops(nullptr) {
+             float randomAngle, float acceleration){
         initialize(levels, raysPerStep, dropsPerRay,
                    dropSize, angleMin, angleMax,
                    randomAngle, acceleration);
@@ -77,17 +77,12 @@ public:
     // update the pool with moved drops
     void update(float dtime, Pool & pool);
 
-    ~Fountain() {
-        delete [] drops;
-        delete [] dropPositions;
-    }
-
     FVector3 center;  // center of this fountain
 private:
     int numDrops;  // number of drops
     float dropSize;  // size of drops
-    FVector3 * dropPositions;  // positions of the drops this fountain emits
-    Drop * drops;  // drop info(speed, accelerations, etc.)
+    std::vector<FVector3> dropPositions;  // positions of the drops this fountain emits
+    std::vector<Drop> drops;  // drop info(speed, accelerations, etc.)
 };
 
 #endif
