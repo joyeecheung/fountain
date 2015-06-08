@@ -2,7 +2,7 @@
 #define CAMERA_H
 
 #include <GL/glut.h>
-#include "FVector.h"
+#include "Vector3.hpp"
 
 /*****
  * Note: angles are all in [0, 90]

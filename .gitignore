@@ -13,3 +13,6 @@ Debug
 Makefile
 *.pdf
 *.html
+*.psess
+*.vsd
+Fountain

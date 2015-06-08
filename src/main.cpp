@@ -6,7 +6,8 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "FVector.h"
+#include "Vector2.hpp"
+#include "Vector3.hpp"
 #include "Texture.h"
 #include "Camera.h"
 #include "Basin.h"
@@ -14,12 +15,15 @@
 #include "Ground.h"
 #include "Pool.h"
 #include "Fountain.h"
+#include "Dragger.h"
+#include "TouringCamera.h"
 
 /***********************
  * Sky and ground Configuration
  ***********************/
 const float SKY_BOX_SIZE = 30.0f;
 const float GROUND_SIZE = 30.0f;
+const float GROUND_TEX_REPEAT = 4.0f;
 
 /***********************
  * Pool Configuration
@@ -48,18 +52,18 @@ const float BASIN_INNER_Z = (OSCILLATORS_NUM_Z * OSCILLATOR_DISTANCE);
 const float DROP_SIZE = 4.0f;
 FInitializer initializers[] = {
     FInitializer(4, 30, 30, DROP_SIZE, 75.0f, 90.0f, 0.2f, 0.10f),  // 1
-    FInitializer(4, 30, 8, DROP_SIZE, 80.0f, 90.0f, 0.2f, 0.08f),  // 2
-    FInitializer(2, 40, 10, DROP_SIZE, 50.0f, 90.0f, 1.5f, 0.13f), // 3
-    FInitializer(3, 5, 100, DROP_SIZE, 75.0f, 90.0f, 0.4f, 0.07f), // 4
-    FInitializer(3, 50, 35, DROP_SIZE, 30.0f, 90.0f, 0.2f, 0.15f), // 5
-    FInitializer(1, 20, 60, DROP_SIZE, 50.0f, 60.0f, 5.0f, 0.13f), // 6
-    FInitializer(6, 20, 30, DROP_SIZE, 90.0f, 90.0f, 1.0f, 0.12f), // 7
-    FInitializer(2, 10, 60, DROP_SIZE, 73.0f, 85.0f, 6.0f, 0.08f)// 8
+    FInitializer(4, 30, 8, DROP_SIZE, 80.0f, 90.0f, 0.2f, 0.08f),   // 2
+    FInitializer(2, 40, 10, DROP_SIZE, 50.0f, 90.0f, 1.5f, 0.13f),  // 3
+    FInitializer(3, 5, 100, DROP_SIZE, 75.0f, 90.0f, 0.4f, 0.07f),  // 4
+    FInitializer(3, 50, 35, DROP_SIZE, 30.0f, 90.0f, 0.2f, 0.15f),  // 5
+    FInitializer(1, 20, 60, DROP_SIZE, 50.0f, 60.0f, 5.0f, 0.13f),  // 6
+    FInitializer(6, 20, 30, DROP_SIZE, 90.0f, 90.0f, 1.0f, 0.12f),  // 7
+    FInitializer(2, 10, 60, DROP_SIZE, 73.0f, 85.0f, 6.0f, 0.08f)   // 8
 };
 
 const float WATER_COLOR[] = { 0.9f, 0.9f, 0.9f, 0.4f };
-const float TIME_DELTA = 0.002f;
-const int FPS = 120;
+const float TIME_DELTA = 0.004f;
+const int FPS = 60;
 
 /***********************
  * Lighting configuration
@@ -80,14 +84,18 @@ const float LIGHT_POSITION_2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
 /***********************
  * Camera Configuration
  ***********************/
-const float MOVE_FACTOR = 0.1f;
-const float ROTATE_FACTOR = 1.0f;
-const float CAMERA_POSITION[] = {
+const float CAMERA_POS[] = {
     BASIN_INNER_X / 2.0f, 1.8f, BASIN_INNER_Z + 3.5f
 };
-const float CAMERA_ROTATION[] = {
-    -5.0f, 0.0f, 0.0f
+const float CAMERA_Y[] = {
+    0, 1, 0
 };
+const float CAMERA_Z[] = {
+    0, 0, -1
+};
+const float CAMERA_MOVING_SPEED = 0.01;
+const float CAMERA_ROTATING_SPEED = 0.03;
+const float CAMERA_ACCELERATION = 0.01;
 
 /***********************
  * Viewport and Window Configuration
@@ -97,12 +105,16 @@ const double CLIP_NEAR = 1.0;
 const double CLIP_FAR = 100.0;
 const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 600;
+int windowWidth = WINDOW_WIDTH;
+int windowHeight = WINDOW_HEIGHT;
 
 
 /***********************
  * Objects in the scene
  ***********************/
-Camera camera;
+Dragger dragger;
+
+TouringCamera touringCamera;
 
 // Water and the floor in the basin
 Pool pool;
@@ -126,10 +138,14 @@ void keyDown(unsigned char key, int x, int y) {
     /***************************
      * Camera controls
      ***************************/
-    case 27:    //ESC
+    case 27:  // ESC
         exit(0);
         break;
-    case 'f':
+    case ' ':
+        touringCamera.stop();
+        dragger.set(windowWidth / 2, windowHeight / 2);
+        break;
+    case 'f':  // full screen
         if (!isFullScreen) {
             glutFullScreen();
             isFullScreen = true;
@@ -137,24 +153,6 @@ void keyDown(unsigned char key, int x, int y) {
             glutReshapeWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
             isFullScreen = false;
         }
-        break;
-    case 'r':
-        camera.rotateX(ROTATE_FACTOR);
-        break;
-    case 'v':
-        camera.rotateX(-ROTATE_FACTOR);
-        break;
-    case 'a':
-        camera.moveX(-MOVE_FACTOR);
-        break;
-    case 'd':
-        camera.moveX(MOVE_FACTOR);
-        break;
-    case 's':
-        camera.moveY(-MOVE_FACTOR);
-        break;
-    case 'w':
-        camera.moveY(MOVE_FACTOR);
         break;
 
     /***************************
@@ -170,26 +168,6 @@ void keyDown(unsigned char key, int x, int y) {
     case '8':
         pool.reset();
         fountain.initialize(initializers[key - '0' - 1]);
-        break;
-    }
-}
-
-void spKeyDown(int key, int x, int y) {
-    switch (key) {
-    /***************************
-    * Camera controls
-    ***************************/
-    case GLUT_KEY_LEFT:
-        camera.rotateY(ROTATE_FACTOR);
-        break;
-    case GLUT_KEY_RIGHT:
-        camera.rotateY(-ROTATE_FACTOR);
-        break;
-    case GLUT_KEY_UP:
-        camera.moveZ(-MOVE_FACTOR);
-        break;
-    case GLUT_KEY_DOWN:
-        camera.moveZ(MOVE_FACTOR);
         break;
     }
 }
@@ -255,7 +233,7 @@ void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    camera.render();
+    touringCamera.look();
 
     glLightfv(GL_LIGHT1, GL_POSITION, LIGHT_POSITION_1);
     glLightfv(GL_LIGHT2, GL_POSITION, LIGHT_POSITION_2);
@@ -272,6 +250,7 @@ void idle(void) {
         // update the fountain and the pool
         fountain.update(TIME_DELTA, pool);
         pool.update(TIME_DELTA);
+        touringCamera.update(dragger.lastPos);
 
         //render the scene:
         display();
@@ -279,6 +258,8 @@ void idle(void) {
     }
 }
 void reshape(int x, int y) {
+    windowWidth = x;
+    windowHeight = y;
     if (y == 0 || x == 0) return;  // invisible
 
     glMatrixMode(GL_PROJECTION);
@@ -287,12 +268,30 @@ void reshape(int x, int y) {
                    CLIP_NEAR, CLIP_FAR);
     glViewport(0, 0, x, y);
     glMatrixMode(GL_MODELVIEW);
+
+    touringCamera.setViewport(x, y);
+
+    // centerize the pointer
+    dragger.set(windowWidth / 2, windowHeight / 2);
+}
+
+void mouseMove(int x, int y) {
+    dragger.move(x, y);
+}
+
+void mouseButton(int button, int state, int x, int y) {
+    // scroll up
+    if (button == 3) {
+        touringCamera.accel(CAMERA_ACCELERATION);
+    // scroll down
+    } else if (button == 4) {
+        touringCamera.accel(-CAMERA_ACCELERATION);
+    }
 }
 
 int main(int argc, char **argv) {
-    static_assert(std::is_pod<FVector3>::value, "FVector3 must be a POD!");
+    static_assert(std::is_pod<FVector3>::value, "FVector must be a POD!");
     static_assert(std::is_pod<Oscillator>::value, "Oscillator must be a POD!");
-
     // initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -333,17 +332,20 @@ int main(int argc, char **argv) {
                      BASIN_INNER_X, BASIN_INNER_Z, std::move(basinTexture));
 
     ground.initialize(-GROUND_SIZE, GROUND_SIZE,
-                      -GROUND_SIZE, GROUND_SIZE, std::move(groundTexture));
+                      -GROUND_SIZE, GROUND_SIZE,
+                      std::move(groundTexture), GROUND_TEX_REPEAT);
 
     // place the fountain in the center of the pool
     fountain.center.set(BASIN_INNER_X / 2.0f, POOL_HEIGHT, BASIN_INNER_Z / 2.0f);
 
     // initialize camera:
-    FVector3 cposition, crotation;
-    cposition.set(CAMERA_POSITION[0], CAMERA_POSITION[1], CAMERA_POSITION[2]);
-    camera.move(cposition);
-    crotation.set(CAMERA_ROTATION[0], CAMERA_ROTATION[1], CAMERA_ROTATION[2]);
-    camera.rotate(crotation);
+    FVector3 CAMERA_POS_V, CAMERA_Y_V, CAMERA_Z_V;
+    CAMERA_POS_V.set(CAMERA_POS[0], CAMERA_POS[1], CAMERA_POS[2]);
+    CAMERA_Y_V.set(CAMERA_Y[0], CAMERA_Y[1], CAMERA_Y[2]);
+    CAMERA_Z_V.set(CAMERA_Z[0], CAMERA_Z[1], CAMERA_Z[2]);
+    touringCamera.init(CAMERA_POS_V, CAMERA_Y_V, CAMERA_Z_V,
+                       CAMERA_MOVING_SPEED, CAMERA_ROTATING_SPEED,
+                       windowWidth, windowHeight);
 
     // enable vertex array
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -383,20 +385,23 @@ int main(int argc, char **argv) {
     // seed
     srand((unsigned)time(NULL));
 
-    printf("1 - 8:\tChange the shape of the fountain\n");
-    printf("up, down:\tMove camera forward / backword\n");
-    printf("left, right:\tTurn camera right / left\n");
-    printf("r, v:\tTurn camera up / down\n");
-    printf("w, s:\tMove camera up / down\n");
-    printf("a, d:\tMove camera left / right\n");
-    printf("ESC:\texit\n");
+    printf("move to rotate\n");
+    printf("scroll to accel\n");
+    printf("space to stop\n");
 
     // register callbacks
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyDown);
-    glutSpecialFunc(spKeyDown);
+    glutPassiveMotionFunc(mouseMove);
+    glutMouseFunc(mouseButton);
     glutIdleFunc(idle);
+
+    // hide cursor
+    glutSetCursor(GLUT_CURSOR_NONE);
+
+    // default: full screen
+    glutFullScreen();
 
     // start
     glutMainLoop();

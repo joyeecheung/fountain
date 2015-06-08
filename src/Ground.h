@@ -10,7 +10,8 @@ class Ground {
 public:
     Ground() {}
     void initialize(float minX, float maxX,
-                    float minZ, float maxZ, std::unique_ptr<Texture> groundTexture);
+                    float minZ, float maxZ,
+                    std::unique_ptr<Texture> groundTexture, float texRepeat);
     void render() const;
 private:
     float minX, maxX;
