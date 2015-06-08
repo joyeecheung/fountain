@@ -16,7 +16,6 @@
 #include "Pool.h"
 #include "Fountain.h"
 #include "Dragger.h"
-#include "TouringCamera.h"
 
 /***********************
  * Sky and ground Configuration
@@ -93,9 +92,16 @@ const float CAMERA_Y[] = {
 const float CAMERA_Z[] = {
     0, 0, -1
 };
-const float CAMERA_MOVING_SPEED = 0.01;
-const float CAMERA_ROTATING_SPEED = 0.03;
-const float CAMERA_ACCELERATION = 0.01;
+
+const float MOVE_SPEED = 0.1f;
+const float ROTATE_SPEED = 1.0f;
+const float ROTATE_FACTOR = 0.25f;
+const float CAMERA_POSITION[] = {
+    BASIN_INNER_X / 2.0f, 1.8f, BASIN_INNER_Z + 3.5f
+};
+const float CAMERA_ROTATION[] = {
+    -5.0f, 0.0f, 0.0f
+};
 
 /***********************
  * Viewport and Window Configuration
@@ -114,7 +120,7 @@ int windowHeight = WINDOW_HEIGHT;
  ***********************/
 Dragger dragger;
 
-TouringCamera touringCamera;
+Camera camera;
 
 // Water and the floor in the basin
 Pool pool;
@@ -132,27 +138,36 @@ Skybox skybox;
 Ground ground;
 
 bool isFullScreen = false;
+bool mouseControl = false;
+
+int mouseX = 0, mouseY = 0;
+void mouseMove(int x, int y) {
+    if (mouseControl) {
+        camera.rotateX((mouseY - y) * ROTATE_FACTOR);
+        camera.rotateY((mouseX - x) * ROTATE_FACTOR);
+    }
+    mouseX = x;
+    mouseY = y;
+}
 
 void keyDown(unsigned char key, int x, int y) {
     switch (key) {
-    /***************************
-     * Camera controls
-     ***************************/
     case 27:  // ESC
         exit(0);
-        break;
-    case ' ':
-        touringCamera.stop();
-        dragger.set(windowWidth / 2, windowHeight / 2);
         break;
     case 'f':  // full screen
         if (!isFullScreen) {
             glutFullScreen();
             isFullScreen = true;
+            glutWarpPointer(mouseX, mouseY);
         } else {
             glutReshapeWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
             isFullScreen = false;
+            glutWarpPointer(mouseX, mouseY);
         }
+        break;
+    case 'c':
+        mouseControl = !mouseControl;
         break;
 
     /***************************
@@ -169,6 +184,55 @@ void keyDown(unsigned char key, int x, int y) {
         pool.reset();
         fountain.initialize(initializers[key - '0' - 1]);
         break;
+    }
+
+    if (mouseControl)
+        return;
+
+    /***************************
+     * Camera controls
+     ***************************/
+    switch (key) {
+        case 'r':
+            camera.rotateX(ROTATE_SPEED);
+            break;
+        case 'v':
+            camera.rotateX(-ROTATE_SPEED);
+            break;
+        case 'a':
+            camera.moveX(-MOVE_SPEED);
+            break;
+        case 'd':
+            camera.moveX(MOVE_SPEED);
+            break;
+        case 's':
+            camera.moveY(-MOVE_SPEED);
+            break;
+        case 'w':
+            camera.moveY(MOVE_SPEED);
+            break;
+    }
+}
+
+void spKeyDown(int key, int x, int y) {
+    if (mouseControl) return;
+
+    switch (key) {
+        /***************************
+        * Camera controls
+        ***************************/
+        case GLUT_KEY_LEFT:
+            camera.rotateY(ROTATE_SPEED);
+            break;
+        case GLUT_KEY_RIGHT:
+            camera.rotateY(-ROTATE_SPEED);
+            break;
+        case GLUT_KEY_UP:
+            camera.moveZ(-MOVE_SPEED);
+            break;
+        case GLUT_KEY_DOWN:
+            camera.moveZ(MOVE_SPEED);
+            break;
     }
 }
 
@@ -233,7 +297,8 @@ void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    touringCamera.look();
+    camera.render();
+    //touringCamera.render();
 
     glLightfv(GL_LIGHT1, GL_POSITION, LIGHT_POSITION_1);
     glLightfv(GL_LIGHT2, GL_POSITION, LIGHT_POSITION_2);
@@ -250,13 +315,13 @@ void idle(void) {
         // update the fountain and the pool
         fountain.update(TIME_DELTA, pool);
         pool.update(TIME_DELTA);
-        touringCamera.update(dragger.lastPos);
 
         //render the scene:
         display();
         lastTime = thisTime;
     }
 }
+
 void reshape(int x, int y) {
     windowWidth = x;
     windowHeight = y;
@@ -268,30 +333,22 @@ void reshape(int x, int y) {
                    CLIP_NEAR, CLIP_FAR);
     glViewport(0, 0, x, y);
     glMatrixMode(GL_MODELVIEW);
-
-    touringCamera.setViewport(x, y);
-
-    // centerize the pointer
-    dragger.set(windowWidth / 2, windowHeight / 2);
-}
-
-void mouseMove(int x, int y) {
-    dragger.move(x, y);
 }
 
 void mouseButton(int button, int state, int x, int y) {
     // scroll up
     if (button == 3) {
-        touringCamera.accel(CAMERA_ACCELERATION);
+        camera.moveZ(-MOVE_SPEED);
     // scroll down
     } else if (button == 4) {
-        touringCamera.accel(-CAMERA_ACCELERATION);
+        camera.moveZ(MOVE_SPEED);
     }
 }
 
 int main(int argc, char **argv) {
     static_assert(std::is_pod<FVector3>::value, "FVector must be a POD!");
     static_assert(std::is_pod<Oscillator>::value, "Oscillator must be a POD!");
+
     // initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -339,13 +396,11 @@ int main(int argc, char **argv) {
     fountain.center.set(BASIN_INNER_X / 2.0f, POOL_HEIGHT, BASIN_INNER_Z / 2.0f);
 
     // initialize camera:
-    FVector3 CAMERA_POS_V, CAMERA_Y_V, CAMERA_Z_V;
-    CAMERA_POS_V.set(CAMERA_POS[0], CAMERA_POS[1], CAMERA_POS[2]);
-    CAMERA_Y_V.set(CAMERA_Y[0], CAMERA_Y[1], CAMERA_Y[2]);
-    CAMERA_Z_V.set(CAMERA_Z[0], CAMERA_Z[1], CAMERA_Z[2]);
-    touringCamera.init(CAMERA_POS_V, CAMERA_Y_V, CAMERA_Z_V,
-                       CAMERA_MOVING_SPEED, CAMERA_ROTATING_SPEED,
-                       windowWidth, windowHeight);
+    FVector3 cposition, crotation;
+    cposition.set(CAMERA_POSITION[0], CAMERA_POSITION[1], CAMERA_POSITION[2]);
+    camera.move(cposition);
+    crotation.set(CAMERA_ROTATION[0], CAMERA_ROTATION[1], CAMERA_ROTATION[2]);
+    camera.rotate(crotation);
 
     // enable vertex array
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -394,14 +449,12 @@ int main(int argc, char **argv) {
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyDown);
     glutPassiveMotionFunc(mouseMove);
+    glutSpecialFunc(spKeyDown);
     glutMouseFunc(mouseButton);
     glutIdleFunc(idle);
 
     // hide cursor
     glutSetCursor(GLUT_CURSOR_NONE);
-
-    // default: full screen
-    glutFullScreen();
 
     // start
     glutMainLoop();
