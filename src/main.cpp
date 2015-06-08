@@ -267,11 +267,24 @@ void renderBitmapString(float x, float y, float z,
     }
 }
 
+void vecToString(char *buffer, const char *format, FVector3 vec) {
+    sprintf(buffer, format, vec.x, vec.y, vec.z);
+}
+
 int lastTime = 0;
 int thisTime = 0;
-void countFrames() {
-    char pixelstring[30];
-    sprintf(pixelstring, "fps: %4.2f", 1000.0 / (thisTime - lastTime));
+void showText() {
+    char frameInfo[30], positionInfo[50],
+        rotationInfo[50], directionInfo[50];
+
+    sprintf(frameInfo, "fps: %4.2f", 1000.0 / (thisTime - lastTime));
+    camera.updateDirection();
+    vecToString(positionInfo,
+                "Camera position %3.2f, %3.2f, %3.2f", camera.getPosition());
+    vecToString(rotationInfo,
+                "Camera rotation %3.2f, %3.2f, %3.2f", camera.getRotation());
+    vecToString(directionInfo,
+                "Camera direction %3.2f, %3.2f, %3.2f", camera.getDirection());
 
     // draw status text
     glPushMatrix();
@@ -285,7 +298,15 @@ void countFrames() {
     glMatrixMode(GL_MODELVIEW);
 
     // render the string
-    renderBitmapString(10, 10, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, pixelstring);
+    renderBitmapString(5, 10, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, frameInfo);
+    renderBitmapString(5, 160, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, positionInfo);
+    renderBitmapString(5, 170, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, rotationInfo);
+    renderBitmapString(5, 180, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, directionInfo);
+
+    if (mouseControl)
+        renderBitmapString(160, 180, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, "Mouse Mode");
+    else
+        renderBitmapString(160, 180, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, "Keyboard Mode");
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -298,14 +319,13 @@ void display(void) {
     glLoadIdentity();
 
     camera.render();
-    //touringCamera.render();
 
     glLightfv(GL_LIGHT1, GL_POSITION, LIGHT_POSITION_1);
     glLightfv(GL_LIGHT2, GL_POSITION, LIGHT_POSITION_2);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     drawScene();
-    countFrames();
+    showText();
     glutSwapBuffers();
 }
 
@@ -440,9 +460,22 @@ int main(int argc, char **argv) {
     // seed
     srand((unsigned)time(NULL));
 
-    printf("move to rotate\n");
-    printf("scroll to accel\n");
-    printf("space to stop\n");
+    printf("1 - 8:\tChange the shape of the fountain\n");
+    printf("f:\tToggle fullscreen\n");
+    printf("c:\tSwitch between mouse mode / keyboard mode\n");
+
+    printf("----------- Keyboard Mode -----------------\n");
+    printf("up, down:\tMove camera forward / backword\n");
+    printf("left, right:\tTurn camera right / left\n");
+    printf("r, v:\tTurn camera up / down\n");
+    printf("w, s:\tMove camera up / down\n");
+    printf("a, d:\tMove camera left / right\n");
+
+    printf("----------- Mouse Mode -----------------\n");
+    printf("Mouse move:\tRotate camera\n");
+    printf("Mouse scroll:\tMove forward / backward\n");
+
+    printf("ESC:\tExit\n");
 
     // register callbacks
     glutDisplayFunc(display);

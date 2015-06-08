@@ -7,6 +7,7 @@ void Camera::move(const FVector3 &dir) {
 
 void Camera::rotate(const FVector3 &dir) {
     rotation.addBy(dir);
+    directionChanged = true;
 }
 
 void Camera::moveX(GLfloat delta) {
@@ -54,6 +55,8 @@ void Camera::render(void) const {
 }
 
 void Camera::updateDirection(void) {
+    if (!directionChanged)
+        return;
     // rotate around Y-axis
     FVector3 step1;
     step1.set(cos((rotation.y + 90.0) * DEGREE),
@@ -65,4 +68,16 @@ void Camera::updateDirection(void) {
     // TODO: rotate around Z-axis
     direction = step2;
     directionChanged = false;
+}
+
+FVector3 Camera::getPosition() const {
+    return position;
+}
+
+FVector3 Camera::getDirection() const {
+    return direction;
+}
+
+FVector3 Camera::getRotation() const {
+    return rotation;
 }

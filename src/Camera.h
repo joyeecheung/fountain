@@ -26,14 +26,17 @@ public:
     void rotateX(float angle);
     void rotateY(float angle);
     void rotateZ(float angle);
+    FVector3 getPosition() const;
+    FVector3 getDirection() const;
+    FVector3 getRotation() const;
+    void updateDirection(void);
 private:
     FVector3 position;
     /* needs to mark the update by setting directionChanged to true
      * before calling any move function */
-    FVector3 direction; 
-    bool directionChanged;
+    FVector3 direction;
     FVector3 rotation;
-    void updateDirection(void);
+    bool directionChanged;
 };
 
 #endif
