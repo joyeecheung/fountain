@@ -2,7 +2,7 @@
 #define FOUNTAIN_H
 
 #include <vector>
-#include "Vector3.tpp"
+#include "Vector3.hpp"
 #include "Pool.h"
 
 // fountain initializers

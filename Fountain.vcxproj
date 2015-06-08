@@ -96,8 +96,8 @@
     <ClInclude Include="src\SkyBox.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\TouringCamera.h" />
-    <ClInclude Include="src\Vector2.tpp" />
-    <ClInclude Include="src\Vector3.tpp" />
+    <ClInclude Include="src\Vector2.hpp" />
+    <ClInclude Include="src\Vector3.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resource\grass.bmp" />

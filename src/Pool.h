@@ -5,7 +5,7 @@
 #include <vector>
 #include <GL/glut.h>
 
-#include "Vector3.tpp"
+#include "Vector3.hpp"
 #include "Texture.h"
 
 struct Oscillator {

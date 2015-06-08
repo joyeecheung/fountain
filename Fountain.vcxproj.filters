@@ -74,10 +74,10 @@
     <ClInclude Include="src\TouringCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Vector2.tpp">
+    <ClInclude Include="src\Vector2.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Vector3.tpp">
+    <ClInclude Include="src\Vector3.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

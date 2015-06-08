@@ -1,6 +1,6 @@
 #include <vector>
 #include "Pool.h"
-#include "Vector3.tpp" 
+#include "Vector3.hpp" 
 
 void Pool::initialize(int oNumX, int oNumZ, float height,
                       float oDistance, float oWeight,
