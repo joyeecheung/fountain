@@ -15,11 +15,6 @@
 #include "Pool.h"
 #include "Fountain.h"
 
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 /***********************
  * Sky and ground Configuration
  ***********************/
@@ -295,8 +290,9 @@ void reshape(int x, int y) {
 }
 
 int main(int argc, char **argv) {
-    static_assert(std::is_pod<FVector3>::value, "FVector must be a POD!");
+    static_assert(std::is_pod<FVector3>::value, "FVector3 must be a POD!");
     static_assert(std::is_pod<Oscillator>::value, "Oscillator must be a POD!");
+
     // initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
