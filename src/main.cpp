@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "Vector2.hpp"
-#include "Vector3.hpp"
+#include "Vector2.tpp"
+#include "Vector3.tpp"
 #include "Texture.h"
 #include "Camera.h"
 #include "Basin.h"

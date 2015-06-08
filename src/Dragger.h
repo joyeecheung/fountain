@@ -1,7 +1,7 @@
 #ifndef DRAGGER_H
 #define DRAGGER_H
 
-#include "Vector2.hpp"
+#include "Vector2.tpp"
 
 #include <functional>
 #include <GL/glut.h>

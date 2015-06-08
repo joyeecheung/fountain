@@ -1,6 +1,6 @@
 #include "TouringCamera.h"
-#include "Vector3.hpp"
-#include "Vector2.hpp"
+#include "Vector3.tpp"
+#include "Vector2.tpp"
 
 #include <GL/glut.h>
 
