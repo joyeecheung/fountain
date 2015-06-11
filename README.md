@@ -16,7 +16,7 @@ A fountain built with OpenGL fixed piepline.
 
 Note: this can look quite different on different machines:
 
-* The computational power(or, the optimization performed by the compiler) will affect the frame rate, therefore affect the speed of the fountain water.
+* The computational power(or, the optimization performed by the compiler) will affect the frame rate, therefore affect the speed of the fountain water. If your computer is powerful enough, the frame rate will be around 58fps.
 * The resolution of the screen will affect the overall experience, including font size, texture, and the size of water particles.
 
 Under normal resolution, it looks like this:
@@ -66,13 +66,20 @@ To lower down the burden on the CPU, the preset shapes are rather simple(with no
 ## Operations
 
 * <kbd>1</kbd> - <kbd>8</kbd>: Change the shape of the fountain
+* <kbd>f</kbd>: Toggle fullscreen mode
+* <kbd>c</kbd>: Toggle mouse mode
+* <kbd>ESC</kbd>: exit
+
+### Under Keyboard Mode
 * <kbd>→</kbd>, <kbd>←</kbd>: Turn camera right / left
 * <kbd>↑</kbd>, <kbd>↓</kbd>: Move camera forward / backword
 * <kbd>r</kbd>, <kbd>v</kbd>: Turn camera up / down
 * <kbd>w</kbd>, <kbd>s</kbd>: Move camera up / down
 * <kbd>a</kbd>, <kbd>d</kbd>: Move camera left / right
-* <kbd>F</kbd>: toggle fullscreen mode
-* <kbd>ESC</kbd>: exit
+
+### Under Mouse mode
+* Mouse move: Rotate camera
+* Mouse scroll: tMove forward / backward
 
 ## File structure
 
