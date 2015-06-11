@@ -15,7 +15,6 @@
 #include "Ground.h"
 #include "Pool.h"
 #include "Fountain.h"
-#include "Dragger.h"
 
 /***********************
  * Sky and ground Configuration
@@ -106,17 +105,15 @@ int windowHeight = WINDOW_HEIGHT;
 
 const float INFO_POSITION_Z = 0.0f;
 const float FPS_INFO_POSITION[] = { 0.02f, 0.05f, INFO_POSITION_Z };
-const float CAMPOS_INFO_POSITION[] = { 0.02f, 0.87f, INFO_POSITION_Z };
-const float CAMROT_INFO_POSITION[] = { 0.02f, 0.91f, INFO_POSITION_Z };
+const float CAMPOS_INFO_POSITION[] = { 0.02f, 0.85f, INFO_POSITION_Z };
+const float CAMROT_INFO_POSITION[] = { 0.02f, 0.90f, INFO_POSITION_Z };
 const float CAMDIR_INFO_POSITION[] = { 0.02f, 0.95f, INFO_POSITION_Z };
-const float CONTROL_INFO_POSITION[] = { 0.85f, 0.95f, INFO_POSITION_Z };
-void *INFO_FONT = GLUT_BITMAP_HELVETICA_18;
+const float CONTROL_INFO_POSITION[] = { 0.82f, 0.95f, INFO_POSITION_Z };
+void *INFO_FONT = GLUT_BITMAP_TIMES_ROMAN_24;
 
 /***********************
  * Objects in the scene
  ***********************/
-Dragger dragger;
-
 Camera camera;
 
 // Water and the floor in the basin
@@ -152,7 +149,8 @@ void keyDown(unsigned char key, int x, int y) {
     case 27:  // ESC
         exit(0);
         break;
-    case 'f':  // full screen
+    case 'f':
+    case 'F': // full screen
         if (!isFullScreen) {
             glutFullScreen();
             isFullScreen = true;
@@ -164,6 +162,7 @@ void keyDown(unsigned char key, int x, int y) {
         }
         break;
     case 'c':
+    case 'C':
         mouseControl = !mouseControl;
         break;
 
@@ -191,21 +190,27 @@ void keyDown(unsigned char key, int x, int y) {
      ***************************/
     switch (key) {
         case 'r':
+        case 'R':
             camera.rotateX(ROTATE_SPEED);
             break;
         case 'v':
+        case 'V':
             camera.rotateX(-ROTATE_SPEED);
             break;
         case 'a':
+        case 'A':
             camera.moveX(-MOVE_SPEED);
             break;
         case 'd':
+        case 'D':
             camera.moveX(MOVE_SPEED);
             break;
         case 's':
+        case 'S':
             camera.moveY(-MOVE_SPEED);
             break;
         case 'w':
+        case 'W':
             camera.moveY(MOVE_SPEED);
             break;
     }

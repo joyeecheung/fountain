@@ -77,7 +77,6 @@
   <ItemGroup>
     <ClCompile Include="src\Basin.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\Dragger.cpp" />
     <ClCompile Include="src\Fountain.cpp" />
     <ClCompile Include="src\Ground.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -88,7 +87,6 @@
   <ItemGroup>
     <ClInclude Include="src\Basin.h" />
     <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\Dragger.h" />
     <ClInclude Include="src\Fountain.h" />
     <ClInclude Include="src\Ground.h" />
     <ClInclude Include="src\Pool.h" />
