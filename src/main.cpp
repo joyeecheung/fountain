@@ -20,9 +20,9 @@
 /***********************
  * Sky and ground Configuration
  ***********************/
-const float SKY_BOX_SIZE = 30.0f;
-const float GROUND_SIZE = 30.0f;
-const float GROUND_TEX_REPEAT = 4.0f;
+const float SKY_BOX_SIZE = 300.0f;
+const float GROUND_SIZE = 300.0f;
+const float GROUND_TEX_REPEAT = 40.0f;
 
 /***********************
  * Pool Configuration
@@ -83,16 +83,6 @@ const float LIGHT_POSITION_2[] = { 0.8f, -0.2f, -0.5f, 0.0f };
 /***********************
  * Camera Configuration
  ***********************/
-const float CAMERA_POS[] = {
-    BASIN_INNER_X / 2.0f, 1.8f, BASIN_INNER_Z + 3.5f
-};
-const float CAMERA_Y[] = {
-    0, 1, 0
-};
-const float CAMERA_Z[] = {
-    0, 0, -1
-};
-
 const float MOVE_SPEED = 0.1f;
 const float ROTATE_SPEED = 1.0f;
 const float ROTATE_FACTOR = 0.25f;
@@ -108,12 +98,19 @@ const float CAMERA_ROTATION[] = {
  ***********************/
 const double FIELD_OF_VIEW = 45.0;
 const double CLIP_NEAR = 1.0;
-const double CLIP_FAR = 100.0;
+const double CLIP_FAR = 10000.0;
 const int WINDOW_WIDTH = 1000;
 const int WINDOW_HEIGHT = 600;
 int windowWidth = WINDOW_WIDTH;
 int windowHeight = WINDOW_HEIGHT;
 
+const float INFO_POSITION_Z = 0.0f;
+const float FPS_INFO_POSITION[] = { 0.02f, 0.05f, INFO_POSITION_Z };
+const float CAMPOS_INFO_POSITION[] = { 0.02f, 0.87f, INFO_POSITION_Z };
+const float CAMROT_INFO_POSITION[] = { 0.02f, 0.91f, INFO_POSITION_Z };
+const float CAMDIR_INFO_POSITION[] = { 0.02f, 0.95f, INFO_POSITION_Z };
+const float CONTROL_INFO_POSITION[] = { 0.85f, 0.95f, INFO_POSITION_Z };
+void *INFO_FONT = GLUT_BITMAP_HELVETICA_18;
 
 /***********************
  * Objects in the scene
@@ -258,10 +255,10 @@ void drawScene(void) {
     glDisable(GL_BLEND);
 }
 
-void renderBitmapString(float x, float y, float z,
+void renderBitmapString(const float position[3],
                         void *font, const char *string) {
     const char *c;
-    glRasterPos3f(x, y, z);
+    glRasterPos3fv(position);
     for (c = string; *c != '\0'; c++) {
         glutBitmapCharacter(font, *c);
     }
@@ -294,19 +291,19 @@ void showText() {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0, 200, 0, 200);
+    gluOrtho2D(0, 1, 0, 1);
     glMatrixMode(GL_MODELVIEW);
 
     // render the string
-    renderBitmapString(5, 10, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, frameInfo);
-    renderBitmapString(5, 160, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, positionInfo);
-    renderBitmapString(5, 170, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, rotationInfo);
-    renderBitmapString(5, 180, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, directionInfo);
+    renderBitmapString(FPS_INFO_POSITION, INFO_FONT, frameInfo);
+    renderBitmapString(CAMPOS_INFO_POSITION, INFO_FONT, positionInfo);
+    renderBitmapString(CAMROT_INFO_POSITION, INFO_FONT, rotationInfo);
+    renderBitmapString(CAMDIR_INFO_POSITION, INFO_FONT, directionInfo);
 
     if (mouseControl)
-        renderBitmapString(160, 180, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, "Mouse Mode");
+        renderBitmapString(CONTROL_INFO_POSITION, INFO_FONT, "Mouse Mode");
     else
-        renderBitmapString(160, 180, 0.0, GLUT_BITMAP_TIMES_ROMAN_24, "Keyboard Mode");
+        renderBitmapString(CONTROL_INFO_POSITION, INFO_FONT, "Keyboard Mode");
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);

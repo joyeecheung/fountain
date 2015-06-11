@@ -84,7 +84,6 @@
     <ClCompile Include="src\Pool.cpp" />
     <ClCompile Include="src\SkyBox.cpp" />
     <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\TouringCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Basin.h" />
@@ -95,7 +94,6 @@
     <ClInclude Include="src\Pool.h" />
     <ClInclude Include="src\SkyBox.h" />
     <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\TouringCamera.h" />
     <ClInclude Include="src\Vector2.hpp" />
     <ClInclude Include="src\Vector3.hpp" />
   </ItemGroup>
